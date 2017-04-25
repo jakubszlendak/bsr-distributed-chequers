@@ -42,7 +42,7 @@ public class EventDispatcher {
         getInstance()._sendEvent(event);
     }
     
-    private void _registerEventObserver(Class<? extends IEvent> eventClass, IEventObserver observer) {
+    private synchronized void _registerEventObserver(Class<? extends IEvent> eventClass, IEventObserver observer) {
         List<IEventObserver> observers = eventObservers.get(eventClass);
         if (observers == null) {
             observers = new ArrayList<>();
@@ -53,7 +53,7 @@ public class EventDispatcher {
         eventObservers.put(eventClass, observers);
     }
     
-    private void _unregisterEventObserver(IEventObserver observer) {
+    private synchronized void _unregisterEventObserver(IEventObserver observer) {
         for (Class<? extends IEvent> clazz : eventObservers.keySet()) {
             List<IEventObserver> observers = eventObservers.get(clazz);
             if (observers != null) {
@@ -62,7 +62,7 @@ public class EventDispatcher {
         }
     }
     
-    private void _sendEvent(IEvent event) {
+    private synchronized void _sendEvent(IEvent event) {
         eventsQueue.add(event);
         dispatchEvents();
     }

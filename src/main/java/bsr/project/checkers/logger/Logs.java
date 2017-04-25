@@ -3,7 +3,7 @@ package bsr.project.checkers.logger;
 public class Logs {
     
     private static final LogLevel CONSOLE_LEVEL = LogLevel.ALL;
-    private static final LogLevel SHOW_TRACE_DETAILS_LEVEL = LogLevel.DEBUG;
+    private static final LogLevel SHOW_TRACE_DETAILS_LEVEL = LogLevel.TRACE;
     private static final boolean SHOW_EXCEPTIONS_TRACE = true;
     
     // console text formatting characters
