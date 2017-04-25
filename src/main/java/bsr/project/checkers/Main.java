@@ -1,8 +1,10 @@
 package bsr.project.checkers;
 
+import bsr.project.checkers.logger.Logs;
+
 public class Main {
     
     public static void main(String[] args) {
-        System.out.println("hello dupa");
+        Logs.info("hello dupa");
     }
 }
