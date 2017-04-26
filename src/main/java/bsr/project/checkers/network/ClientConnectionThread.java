@@ -9,7 +9,6 @@ import java.net.Socket;
 
 import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.session.client.ClientInfo;
-import sun.plugin.dom.exception.InvalidStateException;
 
 public class ClientConnectionThread extends Thread {
 	
@@ -83,8 +82,8 @@ public class ClientConnectionThread extends Thread {
 	}
 	
 	public synchronized void sendLine(String line) {
-		if (!active) throw new InvalidStateException("Client connection is not active");
-		if (out == null) throw new InvalidStateException("No output stream");
+		if (!active) throw new IllegalStateException("Client connection is not active");
+		if (out == null) throw new IllegalStateException("No output stream");
 		out.println(line);
 		out.flush();
 	}
