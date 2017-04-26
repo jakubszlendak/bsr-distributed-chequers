@@ -8,17 +8,13 @@ public class ServerApplication {
     private UsersDatabase usersDatabase;
     
     public ServerApplication(String[] args) {
+        Logs.info("Starting server application...");
+        usersDatabase = new UsersDatabase();
     }
     
     public void run() {
-        Logs.info("hello dupa");
-        
-        
-        usersDatabase = new UsersDatabase();
-        
-        usersDatabase.addUser("janusz", "dupa");
-        
-        
-        Logs.info("server closed");
+    
+    
+        Logs.info("Server closed");
     }
 }

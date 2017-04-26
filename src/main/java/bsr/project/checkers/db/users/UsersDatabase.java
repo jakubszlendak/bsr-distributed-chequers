@@ -25,7 +25,6 @@ public class UsersDatabase {
     }
     
     public synchronized void loadUsers() {
-        
         Logs.debug("loading users database from file " + USERS_DATAFILE + "...");
         
         Properties prop = new Properties();
@@ -54,7 +53,6 @@ public class UsersDatabase {
     }
     
     private synchronized void saveUsers() {
-        
         Logs.debug("saving new users database...");
         
         Properties prop = new Properties();
@@ -107,6 +105,7 @@ public class UsersDatabase {
             String hashed = hashPassword(password);
             users.add(new User(login, hashed));
             saveUsers();
+            Logs.info("new user " + login + " has been added.");
         } else {
             Logs.warn("user " + login + " already exists");
         }
