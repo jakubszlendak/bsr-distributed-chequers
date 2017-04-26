@@ -1,3 +1,5 @@
+### Java Server for Multiplayer Checkers
+
 Author: Ireneusz Szulc
 
 License: Beerware

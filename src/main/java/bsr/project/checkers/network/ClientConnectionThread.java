@@ -1,12 +1,15 @@
-class ClientConnectionThread extends Thread {
+public class ClientConnectionThread extends Thread {
 
    private Socket clientSocket;
    private volatile boolean active = true;
    BufferedReader in = null;
    PrintWriter out = null;
+
+   private ClientInfo clientInfo;
 	
    public ClientConnectionThread(Socket clientSocket) {
       this.clientSocket = clientSocket;
+      clientInfo = new ClientInfo(this);
    }
 	
    public void run() {
