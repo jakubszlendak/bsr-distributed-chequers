@@ -1,4 +1,4 @@
-package bsr.project.checkers.server;
+package bsr.project.checkers;
 
 import bsr.project.checkers.db.users.UsersDatabase;
 import bsr.project.checkers.logger.Logs;

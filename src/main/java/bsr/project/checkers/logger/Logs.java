@@ -23,32 +23,38 @@ public class Logs {
     private static String C_WHITE = "\033[37m";
     
     public static void error(String message) {
-        log(message, LogLevel.ERROR, "[ERROR] " + C_RESET);
-    }
-    
-    public static void error(Throwable ex) {
-        log(ex.getMessage(), LogLevel.ERROR, C_BOLD + C_RED + "[EXCEPTION - " + ex.getClass().getName() + "] " + C_RESET);
-        printExceptionStackTrace(ex);
-    }
-    
-    public static void errorUncaught(Throwable ex) {
-        log(ex.getMessage(), LogLevel.FATAL, C_BOLD + C_RED + "[UNCAUGHT EXCEPTION - " + ex.getClass().getName() + "] " + C_RESET);
-        printExceptionStackTrace(ex);
-    }
+		log(message, LogLevel.ERROR, C_BOLD + C_RED + "[ERROR] " + C_RESET);
+	}
+	
+	public static void error(Throwable ex) {
+		log(ex.getMessage(), LogLevel.ERROR, C_BOLD + C_RED + "[ERROR - " + ex.getClass().getName() + "] " + C_RESET);
+		printExceptionStackTrace(ex);
+	}
+	
+	public static void error(String message, Throwable ex) {
+		log(message, LogLevel.ERROR, C_BOLD + C_RED + "[ERROR - " + ex.getClass().getName() + "] " + C_RESET);
+		log(ex.getMessage(), LogLevel.ERROR, C_BOLD + C_RED + "[ERROR - " + ex.getClass().getName() + "] " + C_RESET);
+		printExceptionStackTrace(ex);
+	}
     
     public static void fatal(String message) {
-        log(message, LogLevel.FATAL, C_BOLD + C_RED + "[ERROR] " + C_RESET);
-        System.exit(1);
-    }
+		log(message, LogLevel.FATAL, C_BOLD + C_RED + "[FATAL ERROR] " + C_RESET);
+		System.exit(1);
+	}
     
     public static void fatal(Throwable ex) {
         String e = ex.getClass().getName() + " - " + ex.getMessage();
         printExceptionStackTrace(ex);
         fatal(e);
     }
-    
-    public static void warn(String message) {
-        log(message, LogLevel.WARN, C_BOLD + C_YELLOW + "[warn] " + C_RESET);
+	
+	public static void fatal(String message, Throwable ex) {
+		printExceptionStackTrace(ex);
+		fatal(message);
+	}
+	
+	public static void warn(String message) {
+		log(message, LogLevel.WARN, C_BOLD + C_YELLOW + "[warn] " + C_RESET);
     }
     
     public static void info(String message) {

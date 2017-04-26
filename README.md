@@ -1,4 +1,4 @@
-### Java Server for Multiplayer Checkers
+### Java Server Application for Multiplayer Checkers Game
 
 Author: Ireneusz Szulc
 

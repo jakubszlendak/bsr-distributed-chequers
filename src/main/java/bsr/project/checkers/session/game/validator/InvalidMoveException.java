@@ -1,6 +1,8 @@
-public class InvalidMoveException extends Exception {
+package bsr.project.checkers.session.game.validator;
 
-	public InvalidMoveException(String message){
+public class InvalidMoveException extends Exception {
+	
+	public InvalidMoveException(String message) {
 		super(message);
 	}
 }
