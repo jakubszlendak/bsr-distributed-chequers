@@ -12,8 +12,8 @@ public class Board {
 	*/
 	private char[][] map;
 	
-	public static final int BOARD_SIZE = 10;
-	public static final int PAWN_INITIAL_ROWS = 4;
+	public static final int BOARD_SIZE = 8;
+	public static final int PAWN_INITIAL_ROWS = 3;
 	
 	public Board() {
 		initBoard();
@@ -65,5 +65,15 @@ public class Board {
 	
 	public char getCell(Point p) {
 		return getCell(p.x, p.y);
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (int y = 0; y < BOARD_SIZE; y++) {
+			for (int x = 0; x < BOARD_SIZE; x++) {
+				sb.append(map[x][y]);
+			}
+		}
+		return sb.toString();
 	}
 }

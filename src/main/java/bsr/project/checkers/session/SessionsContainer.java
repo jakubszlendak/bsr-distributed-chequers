@@ -8,6 +8,8 @@ import bsr.project.checkers.session.game.GameSession;
 
 public class SessionsContainer {
 	
+	//TODO lista gracy jest potrzebna
+	
 	// TODO czy w ogóle jest potrzebny? dowiązanie do gry przechowywane w referencji u klienta
 	// TODO lista gier i klientów do debuggingu
 	

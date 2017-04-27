@@ -10,6 +10,8 @@ public class GameSession {
 	private ClientInfo player1; // WHITE
 	private ClientInfo player2; // NIGGA
 	
+	private char currentPlayer = BoardSymbols.WHITE_PAWN;
+	
 	private Board board;
 	
 	public GameSession(ClientInfo player1, ClientInfo player2) {
@@ -31,10 +33,10 @@ public class GameSession {
 	}
 	
 	private boolean hasWhiteWon() {
-		return board.countSymbols(BoardSymbols.BLACK_PAWN, BoardSymbols.BLACK_SUPER) == 0;
+		return board.countSymbols(BoardSymbols.BLACK_PAWN, BoardSymbols.BLACK_KING) == 0;
 	}
 	
 	private boolean hasBlackWon() {
-		return board.countSymbols(BoardSymbols.WHITE_PAWN, BoardSymbols.WHITE_SUPER) == 0;
+		return board.countSymbols(BoardSymbols.WHITE_PAWN, BoardSymbols.WHITE_KING) == 0;
 	}
 }
