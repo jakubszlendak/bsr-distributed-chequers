@@ -2,11 +2,14 @@ package bsr.project.checkers.server;
 
 import bsr.project.checkers.console.ConsoleReader;
 import bsr.project.checkers.logger.Logs;
+import bsr.project.checkers.network.PacketsController;
 import bsr.project.checkers.network.ServerThread;
 
 public class ServerApplication {
 	
+	private ServerData serverData;
 	private ServerThread serverThread;
+	private PacketsController packetsController;
 	
 	public ServerApplication(String[] args) {
 	}
@@ -15,7 +18,9 @@ public class ServerApplication {
 		try {
 			Logs.info("Starting server application...");
 			
-			ServerData serverData = new ServerData();
+			serverData = new ServerData();
+			
+			packetsController = new PacketsController(serverData);
 			
 			serverThread = new ServerThread(serverData);
 			serverThread.start();

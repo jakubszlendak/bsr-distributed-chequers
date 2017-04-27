@@ -26,4 +26,8 @@ public class ClientData {
 	public ClientConnectionThread getClientConnection() {
 		return clientConnection;
 	}
+	
+	public boolean isConnected() {
+		return clientConnection.isActive();
+	}
 }

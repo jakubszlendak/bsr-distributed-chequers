@@ -8,6 +8,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import bsr.project.checkers.client.ClientData;
+import bsr.project.checkers.dispatcher.EventDispatcher;
+import bsr.project.checkers.events.PacketReceivedEvent;
 import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.server.ServerData;
 
@@ -43,17 +45,17 @@ public class ClientConnectionThread extends Thread {
 				String received = in.readLine();
 				
 				if (received == null) {
-					
-					//end of the stream has been reached
-					// TODO send event disconnection
-					
+					//end of the stream has been reached - client disconnected
 					close();
 					break;
-					
 				} else {
 					
-					System.out.println("Client Says :" + received);
-					//TODO send event: received bytes from client, send to parser
+					// split received message by line feeds
+					for (String line : received.split("\\r|\\n")) {
+						if (!line.isEmpty()) {
+							EventDispatcher.sendEvent(new PacketReceivedEvent(serverData, clientData, line));
+						}
+					}
 					
 				}
 				
@@ -78,7 +80,7 @@ public class ClientConnectionThread extends Thread {
 				out.close();
 				clientSocket.close();
 				active = false;
-				Logs.info("Connection to closed");
+				Logs.info("Client disconnected");
 			} catch (IOException e) {
 				Logs.error(e);
 			}
