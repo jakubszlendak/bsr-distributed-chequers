@@ -1,7 +1,7 @@
 package bsr.project.checkers.events;
 
-import bsr.project.checkers.dispatcher.IEvent;
+import bsr.project.checkers.dispatcher.AbstractEvent;
 
-public class ServerCloseEvent implements IEvent {
+public class ServerCloseEvent extends AbstractEvent {
 	
 }

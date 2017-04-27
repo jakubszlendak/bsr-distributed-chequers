@@ -3,9 +3,10 @@ package bsr.project.checkers.network;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
+import bsr.project.checkers.dispatcher.AbstractEvent;
 import bsr.project.checkers.dispatcher.EventDispatcher;
-import bsr.project.checkers.dispatcher.IEvent;
 import bsr.project.checkers.dispatcher.IEventObserver;
 import bsr.project.checkers.events.ServerCloseEvent;
 import bsr.project.checkers.logger.Logs;
@@ -43,14 +44,17 @@ public class ServerThread extends Thread implements IEventObserver {
 		try {
 			while (active) {
 				Socket clientSocket = serverSocket.accept();
-				ClientConnectionThread clientThread = new ClientConnectionThread(clientSocket);
+				ClientConnectionThread clientThread = new ClientConnectionThread(serverData, clientSocket);
 				clientThread.start();
 			}
+		} catch (SocketException e) {
+			Logs.info("Server connection closed");
 		} catch (IOException e) {
 			Logs.error(e);
 		}
 		
-		Logs.debug("Server thread has stopped");
+		EventDispatcher.unregisterEventObserver(this);
+		Logs.debug("Server thread has finished");
 	}
 	
 	public synchronized void close() {
@@ -58,7 +62,6 @@ public class ServerThread extends Thread implements IEventObserver {
 			try {
 				serverSocket.close();
 				active = false;
-				Logs.debug("Server Stopped");
 			} catch (Exception e) {
 				Logs.error(e);
 			}
@@ -66,9 +69,9 @@ public class ServerThread extends Thread implements IEventObserver {
 	}
 	
 	@Override
-	public void onEvent(IEvent event) {
-		if (event instanceof ServerCloseEvent) {
-			this.close();
-		}
+	public void onEvent(AbstractEvent event) {
+		
+		event.bind(ServerCloseEvent.class, e -> close());
+		
 	}
 }

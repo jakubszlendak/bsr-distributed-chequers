@@ -4,6 +4,6 @@ public interface IEventObserver {
 	
 	void registerEvents();
 	
-	void onEvent(IEvent event);
+	void onEvent(AbstractEvent event);
 	
 }

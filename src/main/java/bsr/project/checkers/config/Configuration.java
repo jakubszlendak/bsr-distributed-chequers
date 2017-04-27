@@ -18,6 +18,7 @@ public class Configuration {
 	}
 	
 	public void loadConfig() {
+		Logs.debug("loading configuration from file " + CONFIG_FILE + "...");
 		
 		Properties prop = new Properties();
 		InputStream input = null;

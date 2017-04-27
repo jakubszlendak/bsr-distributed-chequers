@@ -29,11 +29,19 @@ public class ServerData {
 		return usersDatabase;
 	}
 	
-	public List<ClientData> getClients() {
+	public synchronized List<ClientData> getClients() {
 		return clients;
 	}
 	
-	public List<GameSession> getGames() {
+	public synchronized List<GameSession> getGames() {
 		return games;
+	}
+	
+	public synchronized void addClient(ClientData clientData) {
+		clients.add(clientData);
+	}
+	
+	public synchronized void removeClient(ClientData clientData) {
+		clients.remove(clientData);
 	}
 }

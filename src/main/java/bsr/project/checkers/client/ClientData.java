@@ -23,4 +23,7 @@ public class ClientData {
 		return state;
 	}
 	
+	public ClientConnectionThread getClientConnection() {
+		return clientConnection;
+	}
 }

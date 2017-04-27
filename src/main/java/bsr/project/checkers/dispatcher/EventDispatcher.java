@@ -18,16 +18,16 @@ public class EventDispatcher {
 		return instance;
 	}
 	
-	private final Map<Class<? extends IEvent>, List<IEventObserver>> eventObservers = new HashMap<>();
+	private final Map<Class<? extends AbstractEvent>, List<IEventObserver>> eventObservers = new HashMap<>();
 	
-	private final List<IEvent> eventsQueue = new ArrayList<>();
+	private final List<AbstractEvent> eventsQueue = new ArrayList<>();
 	
 	private volatile boolean dispatching = false;
 	
 	private EventDispatcher() {
 	}
 	
-	public static void registerEventObserver(Class<? extends IEvent> eventClass, IEventObserver observer) {
+	public static void registerEventObserver(Class<? extends AbstractEvent> eventClass, IEventObserver observer) {
 		getInstance()._registerEventObserver(eventClass, observer);
 	}
 	
@@ -35,11 +35,11 @@ public class EventDispatcher {
 		getInstance()._unregisterEventObserver(observer);
 	}
 	
-	public static void sendEvent(IEvent event) {
+	public static void sendEvent(AbstractEvent event) {
 		getInstance()._sendEvent(event);
 	}
 	
-	private void _registerEventObserver(Class<? extends IEvent> eventClass, IEventObserver observer) {
+	private void _registerEventObserver(Class<? extends AbstractEvent> eventClass, IEventObserver observer) {
 		synchronized (eventObservers) {
 			List<IEventObserver> observers = eventObservers.get(eventClass);
 			if (observers == null) {
@@ -54,7 +54,7 @@ public class EventDispatcher {
 	
 	private void _unregisterEventObserver(IEventObserver observer) {
 		synchronized (eventObservers) {
-			for (Class<? extends IEvent> clazz : eventObservers.keySet()) {
+			for (Class<? extends AbstractEvent> clazz : eventObservers.keySet()) {
 				List<IEventObserver> observers = eventObservers.get(clazz);
 				if (observers != null) {
 					observers.removeIf(obs -> obs == observer);
@@ -63,14 +63,14 @@ public class EventDispatcher {
 		}
 	}
 	
-	private void _sendEvent(IEvent event) {
+	private void _sendEvent(AbstractEvent event) {
 		synchronized (eventsQueue) {
 			eventsQueue.add(event);
 		}
 		dispatchEvents();
 	}
 	
-	private void clearEventObservers(Class<? extends IEvent> eventClass) {
+	private void clearEventObservers(Class<? extends AbstractEvent> eventClass) {
 		List<IEventObserver> observers = eventObservers.get(eventClass);
 		if (observers != null) {
 			observers.clear();
@@ -92,7 +92,7 @@ public class EventDispatcher {
 		dispatching = false;
 	}
 	
-	private void dispatch(IEvent event) {
+	private void dispatch(AbstractEvent event) {
 		synchronized (eventObservers) {
 			List<IEventObserver> observers = eventObservers.get(event.getClass());
 			if (observers == null || observers.isEmpty()) {

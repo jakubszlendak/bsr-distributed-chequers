@@ -20,7 +20,7 @@ public class ServerApplication {
 			serverThread = new ServerThread(serverData);
 			serverThread.start();
 			
-			new ConsoleReader().readContinuously();
+			new ConsoleReader(serverData).readContinuously();
 			
 			serverThread.join();
 			Logs.info("Server closed");

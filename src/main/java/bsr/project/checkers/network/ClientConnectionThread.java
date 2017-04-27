@@ -9,6 +9,7 @@ import java.net.Socket;
 
 import bsr.project.checkers.client.ClientData;
 import bsr.project.checkers.logger.Logs;
+import bsr.project.checkers.server.ServerData;
 
 public class ClientConnectionThread extends Thread {
 	
@@ -17,19 +18,22 @@ public class ClientConnectionThread extends Thread {
 	BufferedReader in = null;
 	PrintWriter out = null;
 	
+	private ServerData serverData;
 	private ClientData clientData;
 	
-	public ClientConnectionThread(Socket clientSocket) {
+	public ClientConnectionThread(ServerData serverData, Socket clientSocket) {
 		this.clientSocket = clientSocket;
+		this.serverData = serverData;
 		clientData = new ClientData(this);
 	}
 	
 	@Override
 	public void run() {
 		
-		// TODO new connection event
+		// adding new client
+		serverData.addClient(clientData);
 		
-		Logs.info("Client connected - " + clientSocket.getInetAddress().getHostName());
+		Logs.info("Client connected - " + getHostname());
 		
 		try {
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -59,7 +63,8 @@ public class ClientConnectionThread extends Thread {
 			Logs.error(e);
 		}
 		
-		//TODO remove connection event
+		// remove client from clients list
+		serverData.removeClient(clientData);
 	}
 	
 	public synchronized boolean isActive() {
@@ -73,7 +78,7 @@ public class ClientConnectionThread extends Thread {
 				out.close();
 				clientSocket.close();
 				active = false;
-				System.out.println("Connection closed");
+				Logs.info("Connection to closed");
 			} catch (IOException e) {
 				Logs.error(e);
 			}
@@ -87,4 +92,7 @@ public class ClientConnectionThread extends Thread {
 		out.flush();
 	}
 	
+	public String getHostname() {
+		return clientSocket.getInetAddress().getHostName();
+	}
 }
