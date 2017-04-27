@@ -30,4 +30,8 @@ public class ClientData {
 	public boolean isConnected() {
 		return clientConnection.isActive();
 	}
+	
+	public String getHostname() {
+		return clientConnection.getHostname();
+	}
 }

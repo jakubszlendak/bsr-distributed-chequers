@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * narzędzie do budowania pakietów do wysłania
+ */
 public class PacketsBuilder {
 	
 	private static final String SEPARATOR = "#";
@@ -90,7 +93,7 @@ public class PacketsBuilder {
 		return join("ERS", message);
 	}
 	
-	// odpowiedzi na pakiety w kierunku Server -> Client
+	// odpowiedzi na pakiety z kierunku Client -> Server
 	
 	/**
 	 * Odpowiedź 1. Login - Autoryzacja w systemie

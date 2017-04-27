@@ -35,7 +35,7 @@ public class ClientConnectionThread extends Thread {
 		// adding new client
 		serverData.addClient(clientData);
 		
-		Logs.info("Client connected - " + getHostname());
+		Logs.info("New client connected to server: " + getHostname());
 		
 		try {
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
