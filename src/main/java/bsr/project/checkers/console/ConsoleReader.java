@@ -2,13 +2,15 @@ package bsr.project.checkers.console;
 
 import java.util.Scanner;
 
+import bsr.project.checkers.dispatcher.EventDispatcher;
+import bsr.project.checkers.events.ServerCloseEvent;
 import bsr.project.checkers.logger.Logs;
 
-public class CommandLine {
+public class ConsoleReader {
 	
 	private boolean exit = false;
 	
-	public void read() {
+	public void readContinuously() {
 		while (!exit) {
 			String cmd = readLine();
 			execute(cmd);
@@ -30,7 +32,7 @@ public class CommandLine {
 		} else if (cmd.equals("server open")) {
 			//TODO
 		} else if (cmd.equals("server close")) {
-			//TODO
+			EventDispatcher.sendEvent(new ServerCloseEvent());
 		} else if (cmd.equals("list clients")) {
 			//TODO
 		} else if (cmd.equals("list games")) {

@@ -7,8 +7,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import bsr.project.checkers.client.ClientData;
 import bsr.project.checkers.logger.Logs;
-import bsr.project.checkers.session.client.ClientInfo;
 
 public class ClientConnectionThread extends Thread {
 	
@@ -17,21 +17,20 @@ public class ClientConnectionThread extends Thread {
 	BufferedReader in = null;
 	PrintWriter out = null;
 	
-	private ClientInfo clientInfo;
+	private ClientData clientData;
 	
 	public ClientConnectionThread(Socket clientSocket) {
 		this.clientSocket = clientSocket;
-		clientInfo = new ClientInfo(this);
+		clientData = new ClientData(this);
 	}
 	
 	@Override
 	public void run() {
 		
-		// TODO register for event closeAllConnections
-		
 		// TODO new connection event
 		
-		System.out.println("Accepted Client Address - " + clientSocket.getInetAddress().getHostName());
+		Logs.info("Client connected - " + clientSocket.getInetAddress().getHostName());
+		
 		try {
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
@@ -60,7 +59,7 @@ public class ClientConnectionThread extends Thread {
 			Logs.error(e);
 		}
 		
-		// TODO unregister from all events
+		//TODO remove connection event
 	}
 	
 	public synchronized boolean isActive() {

@@ -4,11 +4,11 @@ import java.text.ParseException;
 
 public class PacketsParser {
 	
-	private static final String JOIN_CHAR = "#";
+	private static final String SEPARATOR = "#";
 	
 	public static void parsePacket(String packet) throws ParseException {
 		
-		String[] parts = packet.split(JOIN_CHAR);
+		String[] parts = packet.split(SEPARATOR);
 		
 		if (parts.length > 0) {
 			

@@ -1,6 +1,9 @@
 package bsr.project.checkers.dispatcher;
 
 public interface IEventObserver {
-    
-    void onEvent(IEvent event);
+	
+	void registerEvents();
+	
+	void onEvent(IEvent event);
+	
 }

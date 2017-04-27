@@ -1,7 +1,7 @@
-package bsr.project.checkers.session.game.validator;
+package bsr.project.checkers.game.validator;
 
-import bsr.project.checkers.session.game.Board;
-import bsr.project.checkers.session.game.Point;
+import bsr.project.checkers.game.Board;
+import bsr.project.checkers.game.Point;
 
 public class MoveValidator {
 	

@@ -1,4 +1,4 @@
-package bsr.project.checkers.session.game;
+package bsr.project.checkers.game;
 
 public class Point {
 	

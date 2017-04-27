@@ -4,21 +4,34 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import bsr.project.checkers.dispatcher.EventDispatcher;
+import bsr.project.checkers.dispatcher.IEvent;
+import bsr.project.checkers.dispatcher.IEventObserver;
+import bsr.project.checkers.events.ServerCloseEvent;
 import bsr.project.checkers.logger.Logs;
+import bsr.project.checkers.server.ServerData;
 
-public class ServerThread extends Thread {
+public class ServerThread extends Thread implements IEventObserver {
 	
-	private int port;
 	private ServerSocket serverSocket;
 	private volatile boolean active = true;
 	
-	public ServerThread(int port) {
-		this.port = port;
+	private ServerData serverData;
+	
+	public ServerThread(ServerData serverData) {
+		this.serverData = serverData;
+		registerEvents();
+	}
+	
+	@Override
+	public void registerEvents() {
+		EventDispatcher.registerEventObserver(ServerCloseEvent.class, this);
 	}
 	
 	@Override
 	public void run() {
 		
+		int port = serverData.getConfiguration().getPort();
 		try {
 			serverSocket = new ServerSocket(port);
 		} catch (IOException e) {
@@ -49,6 +62,13 @@ public class ServerThread extends Thread {
 			} catch (Exception e) {
 				Logs.error(e);
 			}
+		}
+	}
+	
+	@Override
+	public void onEvent(IEvent event) {
+		if (event instanceof ServerCloseEvent) {
+			this.close();
 		}
 	}
 }

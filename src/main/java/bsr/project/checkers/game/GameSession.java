@@ -1,27 +1,27 @@
-package bsr.project.checkers.session.game;
+package bsr.project.checkers.game;
 
+import bsr.project.checkers.client.ClientData;
+import bsr.project.checkers.game.validator.InvalidMoveException;
+import bsr.project.checkers.game.validator.MoveValidator;
 import bsr.project.checkers.protocol.BoardSymbols;
-import bsr.project.checkers.session.client.ClientInfo;
-import bsr.project.checkers.session.game.validator.InvalidMoveException;
-import bsr.project.checkers.session.game.validator.MoveValidator;
 
 public class GameSession {
 	
-	private ClientInfo player1; // WHITE
-	private ClientInfo player2; // NIGGA
+	private ClientData player1; // WHITE
+	private ClientData player2; // NIGGA
 	
 	private char currentPlayer = BoardSymbols.WHITE_PAWN;
 	
 	private Board board;
 	
-	public GameSession(ClientInfo player1, ClientInfo player2) {
+	public GameSession(ClientData player1, ClientData player2) {
 		this.player1 = player1;
 		this.player2 = player2;
 		board = new Board();
 	}
 	
 	
-	public void executeMove(ClientInfo player, Point source, Point target) throws InvalidMoveException {
+	public void executeMove(ClientData player, Point source, Point target) throws InvalidMoveException {
 		char playerColor = player == player1 ? BoardSymbols.WHITE_PAWN : BoardSymbols.BLACK_PAWN;
 		MoveValidator.validateMove(playerColor, board, source, target);
 		// TODO execute move

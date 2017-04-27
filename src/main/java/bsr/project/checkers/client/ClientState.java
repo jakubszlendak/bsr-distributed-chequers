@@ -1,4 +1,4 @@
-package bsr.project.checkers.session.client;
+package bsr.project.checkers.client;
 
 public enum ClientState {
 	

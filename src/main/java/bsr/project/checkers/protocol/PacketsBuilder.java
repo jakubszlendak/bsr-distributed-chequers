@@ -6,10 +6,14 @@ import java.util.stream.Collectors;
 
 public class PacketsBuilder {
 	
-	private static final String JOIN_CHAR = "#";
+	private static final String SEPARATOR = "#";
 	
+	/**
+	 * @param objs
+	 * @return obiekty zrzutowane na String połączone znakiem separatora
+	 */
 	private static String join(Object... objs) {
-		return Arrays.stream(objs).map(Object::toString).collect(Collectors.joining(JOIN_CHAR));
+		return Arrays.stream(objs).map(Object::toString).collect(Collectors.joining(SEPARATOR));
 	}
 	
 	// pakiety w kierunku Server -> Client

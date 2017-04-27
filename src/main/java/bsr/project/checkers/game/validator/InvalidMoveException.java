@@ -1,4 +1,4 @@
-package bsr.project.checkers.session.game.validator;
+package bsr.project.checkers.game.validator;
 
 public class InvalidMoveException extends Exception {
 	

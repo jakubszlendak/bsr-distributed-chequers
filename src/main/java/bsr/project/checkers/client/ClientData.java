@@ -1,16 +1,16 @@
-package bsr.project.checkers.session.client;
+package bsr.project.checkers.client;
 
+import bsr.project.checkers.game.GameSession;
 import bsr.project.checkers.network.ClientConnectionThread;
-import bsr.project.checkers.session.game.GameSession;
 
-public class ClientInfo {
+public class ClientData {
 	
 	private ClientConnectionThread clientConnection;
 	private ClientState state;
-	private GameSession gameSession = null;
 	private String login = null;
+	private GameSession gameSession = null;
 	
-	public ClientInfo(ClientConnectionThread clientConnection) {
+	public ClientData(ClientConnectionThread clientConnection) {
 		this.clientConnection = clientConnection;
 		state = ClientState.NOT_LOGGED_IN;
 	}
