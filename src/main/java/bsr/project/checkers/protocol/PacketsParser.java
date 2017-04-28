@@ -13,7 +13,7 @@ public class PacketsParser {
 	
 	private String getPart(String[] parts, int index) throws ParseException {
 		if (index >= parts.length)
-			throw new ParseException("not enough parameters in received packet", 1);
+			throw new ParseException("not enough parameters", 1);
 		return parts[index];
 	}
 	
@@ -79,7 +79,7 @@ public class PacketsParser {
 			}
 			
 			default:
-				throw new ParseException("Invalid packet type received by server: " + code, 1);
+				throw new ParseException("Invalid packet type: " + code, 1);
 				// TODO send protocol error
 		}
 		

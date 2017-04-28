@@ -23,4 +23,13 @@ public class ProtocolPacket {
 	public List<Object> getParameters(){
 		return parameters;
 	}
+
+	public <T> T getParameter(int index, Class<T> clazz){
+		if (index < 0 || index >= parameters.size())
+			throw new IllegalArgumentException("invalid parameter index");
+		Object param = parameters.get(index);
+		if (!clazz.isInstance(param))
+			throw new IllegalArgumentException("invalid parameter type");
+		return (T) param;
+	}
 }

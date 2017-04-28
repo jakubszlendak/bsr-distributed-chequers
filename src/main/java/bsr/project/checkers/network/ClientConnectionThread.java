@@ -39,7 +39,7 @@ public class ClientConnectionThread extends Thread {
 		// adding new client
 		serverData.addClient(clientData);
 		
-		Logs.info("New client connected to server: " + getHostname());
+		Logs.info("New client has been connected to server: " + getHostname());
 		
 		try {
 			is = clientSocket.getInputStream();
@@ -59,7 +59,7 @@ public class ClientConnectionThread extends Thread {
 					// split received message by line feeds
 					for (String line : received.split("\\r|\\n")) {
 						if (!line.isEmpty()) {
-							EventDispatcher.sendEvent(new PacketReceivedEvent(serverData, clientData, line));
+							EventDispatcher.sendEvent(new PacketReceivedEvent(clientData, line));
 						}
 					}
 					

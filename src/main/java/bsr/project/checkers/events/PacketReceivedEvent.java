@@ -6,18 +6,12 @@ import bsr.project.checkers.server.ServerData;
 
 public class PacketReceivedEvent extends AbstractEvent {
 	
-	private ServerData serverData;
 	private ClientData clientData;
 	private String received;
 	
-	public PacketReceivedEvent(ServerData serverData, ClientData clientData, String received) {
-		this.serverData = serverData;
+	public PacketReceivedEvent(ClientData clientData, String received) {
 		this.clientData = clientData;
 		this.received = received;
-	}
-	
-	public ServerData getServerData() {
-		return serverData;
 	}
 	
 	public ClientData getClientData() {
