@@ -3,9 +3,11 @@ package bsr.project.checkers.network;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 
 import bsr.project.checkers.client.ClientData;
 import bsr.project.checkers.dispatcher.EventDispatcher;
@@ -17,6 +19,8 @@ public class ClientConnectionThread extends Thread {
 	
 	private Socket clientSocket;
 	private volatile boolean active = true;
+	InputStream is = null;
+	InputStreamReader isr = null;
 	BufferedReader in = null;
 	PrintWriter out = null;
 	
@@ -38,7 +42,9 @@ public class ClientConnectionThread extends Thread {
 		Logs.info("New client connected to server: " + getHostname());
 		
 		try {
-			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			is = clientSocket.getInputStream();
+			isr = new InputStreamReader(is);
+			in = new BufferedReader(isr);
 			out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 			
 			while (active) {
@@ -61,6 +67,8 @@ public class ClientConnectionThread extends Thread {
 				
 			}
 			
+		} catch (SocketException e) {
+			Logs.debug(e.getMessage());
 		} catch (Exception e) {
 			Logs.error(e);
 		}
@@ -76,14 +84,22 @@ public class ClientConnectionThread extends Thread {
 	public synchronized void close() {
 		if (active) {
 			try {
-				in.close();
+				if (is != null)
+					is.close();
+				if (isr != null)
+					isr.close();
+				if (in != null)
+					in.close();
 				out.close();
 				clientSocket.close();
+				
 				active = false;
 				Logs.info("Client disconnected");
 			} catch (IOException e) {
 				Logs.error(e);
 			}
+		} else {
+			Logs.info("connection has been already closed");
 		}
 	}
 	

@@ -1,6 +1,8 @@
 package bsr.project.checkers.console;
 
 import java.util.Scanner;
+import java.util.List;
+import java.util.ArrayList;
 
 import bsr.project.checkers.client.ClientData;
 import bsr.project.checkers.dispatcher.EventDispatcher;
@@ -15,7 +17,7 @@ public class ConsoleReader {
 	
 	public ConsoleReader(ServerData serverData) {
 		this.serverData = serverData;
-		Logs.info("type \"help\" to list available commands.");
+		Logs.info("Type \"help\" to list available commands.");
 	}
 	
 	public void readContinuously() {
@@ -46,6 +48,7 @@ public class ConsoleReader {
 			serverClose();
 		} else if (cmd.equals("list clients")) {
 			int number = 1;
+			Logs.info("Clients list ["+serverData.getClients().size()+"]:");
 			for (ClientData clientData : serverData.getClients()) {
 				Logs.info(Integer.toString(number) + ". Client: " + clientData.getClientConnection().getHostname());
 				number++;
@@ -74,7 +77,9 @@ public class ConsoleReader {
 	}
 	
 	private void disconnectAll() {
-		serverData.getClients().forEach(clientData -> clientData.getClientConnection().close());
+		// to avoid concurrent modification
+		List<ClientData> shallowCopy = new ArrayList<>(serverData.getClients());
+		shallowCopy.forEach(clientData -> clientData.getClientConnection().close());
 	}
 	
 	private void serverClose() {

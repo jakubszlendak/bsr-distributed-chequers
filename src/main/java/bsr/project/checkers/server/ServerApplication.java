@@ -16,7 +16,7 @@ public class ServerApplication {
 	
 	public void run() {
 		try {
-			Logs.info("Starting server application...");
+			Logs.debug("Starting server application...");
 			
 			serverData = new ServerData();
 			
