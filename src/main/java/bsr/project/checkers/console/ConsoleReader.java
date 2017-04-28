@@ -31,7 +31,8 @@ public class ConsoleReader {
 	}
 	
 	public void execute(String cmd) {
-		if (cmd.length() == 0) return;
+		if (cmd.length() == 0)
+			return;
 		
 		if (cmd.equals("exit")) {
 			disconnectAll();
@@ -44,8 +45,10 @@ public class ConsoleReader {
 		} else if (cmd.equals("server close")) {
 			serverClose();
 		} else if (cmd.equals("list clients")) {
+			int number = 1;
 			for (ClientData clientData : serverData.getClients()) {
-				Logs.info("Client: " + clientData.getClientConnection().getHostname());
+				Logs.info(Integer.toString(number) + ". Client: " + clientData.getClientConnection().getHostname());
+				number++;
 			}
 		} else if (cmd.equals("list games")) {
 			//TODO
@@ -60,7 +63,14 @@ public class ConsoleReader {
 	}
 	
 	private void printHelp() {
-	
+		Logs.info("Available commands:");
+		Logs.info("exit - close all connections and exit");
+		Logs.info("server open");
+		Logs.info("server close");
+		Logs.info("list clients");
+		Logs.info("list games - list open game sessions");
+		Logs.info("disconnect all - close all client connections");
+		Logs.info("disconnect [number]");
 	}
 	
 	private void disconnectAll() {

@@ -6,7 +6,8 @@
 
 	<groupId>bsr.project.checkers</groupId>
 	<artifactId>server-igrek51</artifactId>
-	<version>0.1</version>
+	<version>0.2</version>
+	
 	<build>
 		<plugins>
 			<plugin>
