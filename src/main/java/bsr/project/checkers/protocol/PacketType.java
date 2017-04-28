@@ -1,3 +1,5 @@
+package bsr.project.checkers.protocol;
+
 public enum PacketType {
 
 	/**
