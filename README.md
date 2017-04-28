@@ -13,3 +13,8 @@ mvn package
 ```
 java -cp target/server-igrek51-*.jar bsr.project.checkers.Main
 ```
+
+### Testing:
+```
+telnet localhost 4000
+```
