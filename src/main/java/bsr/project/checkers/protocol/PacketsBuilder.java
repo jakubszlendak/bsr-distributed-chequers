@@ -2,7 +2,11 @@ package bsr.project.checkers.protocol;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
+
+import bsr.project.checkers.client.ClientData;
+import bsr.project.checkers.game.Board;
 
 /**
  * narzędzie do budowania pakietów do wysłania do klienta,
@@ -29,7 +33,7 @@ public class PacketsBuilder {
 	 * @param result 1 w przypadku powodzenia, 0 w przypadku niepowodzenia
 	 */
 	public String responseLogin(boolean result){
-		buildPacket(LOG_IN, result ? "1" : "0");
+		return buildPacket(PacketType.LOG_IN, result ? "1" : "0");
 	}
 
 	/**
@@ -37,7 +41,7 @@ public class PacketsBuilder {
 	 * @param result 1 w przypadku powodzenia, 0 w przypadku niepowodzenia
 	 */
 	public String resonseCreateAccount(boolean result){
-		buildPacket(CREATE_ACCOUNT, result ? "1" : "0");
+		return buildPacket(PacketType.CREATE_ACCOUNT, result ? "1" : "0");
 	}
 
 	/**
@@ -50,10 +54,10 @@ public class PacketsBuilder {
 		for (ClientData client : clients){
 			params.add(client.getLogin()); // nazwa
 			// status równy A – oznacza gracza gotowego na grę, status B – oznacza gracza zajętego
-			Stirng status = client.isReadyForNewGame() ? "A" : "B";
+			String status = client.isReadyForNewGame() ? "A" : "B";
 			params.add(status); 
 		}
-		buildPacket(LIST_PLAYERS, params);
+		return buildPacket(PacketType.LIST_PLAYERS, params);
 	}
 
 	/**
@@ -61,7 +65,7 @@ public class PacketsBuilder {
 	 * @param result 1 w przypadku gdy prośba została przekazana, 0 – jeśli wystąpił błąd (gracz o podanej nazwie nie istnieje)
 	 */
 	public String responseCreateRequestForGame(boolean result){
-		buildPacket(CREATE_REQUEST_FOR_GAME, result ? "1" : "0");
+		return buildPacket(PacketType.CREATE_REQUEST_FOR_GAME, result ? "1" : "0");
 	}
 
 	/**
@@ -69,7 +73,7 @@ public class PacketsBuilder {
 	 * @param requestLogin nazwa gracza który nas zaprasza
 	 */
 	public String requestInvitationForGame(String requestLogin){
-		buildPacket(INVITATION_FOR_GAME, requestLogin);
+		return buildPacket(PacketType.INVITATION_FOR_GAME, requestLogin);
 	}
 
 	/**
@@ -77,7 +81,7 @@ public class PacketsBuilder {
 	 * @param agreed 1 - zgoda, 0 - brak zgody
 	 */
 	public String requestResponseForInvitation(boolean agreed){
-		buildPacket(RESPONSE_FOR_INVITATION, agreed ? "1" : "0");
+		return buildPacket(PacketType.RESPONSE_FOR_INVITATION, agreed ? "1" : "0");
 	}
 
 	/**
@@ -85,7 +89,7 @@ public class PacketsBuilder {
 	 * @param yourColor kolor, którymi będzie grał dany zawodnik {@see BoardSymbols}
 	 */
 	public String requestNewGame(char yourColor){
-		buildPacket(NEW_GAME, yourColor);
+		return buildPacket(PacketType.NEW_GAME, yourColor);
 	}
 
 	/**
@@ -94,14 +98,14 @@ public class PacketsBuilder {
 	 */
 	public String requestChangedBoard(Board board){
 		// plansza - 64 znakowy łańcuch tekstowy składający się ze znaków BCDEO
-		buildPacket(CHANGED_BOARD, board.toString());
+		return buildPacket(PacketType.CHANGED_BOARD, board.toString());
 	}
 
 	/**
 	 * 9. Twój ruch - Informacja dla gracza o zmianie stanu – czy może wykonać ruch
 	 */
 	public String requestYourMove(){
-		buildPacket(YOUR_MOVE);
+		return buildPacket(PacketType.YOUR_MOVE);
 	}
 
 	/**
@@ -110,7 +114,7 @@ public class PacketsBuilder {
 	 * @param reason przyczyna
 	 */
 	public String requestGameOver(String winner, String reason) {
-		buildPacket(GAME_OVER, winner, reason);
+		return buildPacket(PacketType.GAME_OVER, winner, reason);
 	}
 
 	/**
@@ -118,7 +122,7 @@ public class PacketsBuilder {
 	 * @param message komunikat
 	 */
 	public String requestProtocolError(String message){
-		buildPacket(ERROR, message);
+		return buildPacket(PacketType.ERROR, message);
 	}
 
 	/**
@@ -126,7 +130,7 @@ public class PacketsBuilder {
 	 * @param message komunikat
 	 */
 	public String requestInvalidState(String message){
-		buildPacket(INVALID_STATE, message);
+		return buildPacket(PacketType.INVALID_STATE, message);
 	}
 
 }

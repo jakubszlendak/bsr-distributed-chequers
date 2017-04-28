@@ -1,5 +1,8 @@
 package bsr.project.checkers.protocol;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class ProtocolPacket {
 
 	private PacketType type;

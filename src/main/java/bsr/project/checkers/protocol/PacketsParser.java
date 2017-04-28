@@ -17,9 +17,9 @@ public class PacketsParser {
 		return parts[index];
 	}
 	
-	public ProtocolPacket parsePacket(String packet) throws ParseException {
+	public ProtocolPacket parsePacket(String packetStr) throws ParseException {
 		
-		String[] parts = packet.split(SEPARATOR);
+		String[] parts = packetStr.split(SEPARATOR);
 		
 		if (parts.length == 0)
 			throw new ParseException("Empty packet", 0);
@@ -39,7 +39,6 @@ public class PacketsParser {
 				// TODO próba zalogowania, weryfikacja hasła z bazą użytkowników, zmiana stanu na LOGGED_IN
 				// TODO odesłanie odpowiedzi : LGN 1 w przypadku powodzenia
 			}
-			break;
 			case CREATE_ACCOUNT: { // 2. Rejestracja - Utworzenie konta w systemie
 				String login = getPart(parts, 1);
 				String passwd = getPart(parts, 2);
@@ -47,46 +46,37 @@ public class PacketsParser {
 				// TODO jeśli nie istnieje użytkownik, dodanie do bazy
 				// TODO odesłanie odpowiedzi : CRA 1 w przypadku powodzenia
 			}
-			break;
 			case LIST_PLAYERS: { // 3. Lista - Pobranie listy graczy
 				return new ProtocolPacket(packetType);
 			}
-			break;
 			case CREATE_REQUEST_FOR_GAME: { // 4. Nowa gra - Prośba o rozpoczęcie nowej gry
 				// nazwa graca z którym chcemy się zmierzyć
 				String login = getPart(parts, 1);
 				return new ProtocolPacket(packetType, login);
 			}
-			break;
 			case GIVE_UP: { // 10. Poddaj - zakoncz grę - poddaj się
 				return new ProtocolPacket(packetType);
 			}
-			break;
 			case LOG_OUT: { // 12. Wylogowanie - koniec komunikacji
 				return new ProtocolPacket(packetType);
 			}
-			break;
 			// odpowiedzi na pakiety z kierunku Server -> Client
 			case INVITATION_FOR_GAME: { // 5. Pytanie o grę - przekazanie prośby o rozpoczęcie nowej gry
 				// 1 – zgoda, 0 – brak zgody
 				String decision = getPart(parts, 1);
 				boolean agreed = decision.equals("1");
-				
 				return new ProtocolPacket(packetType, agreed);
 			}
-			break;
 			case ERROR: { // 13. Błąd protokołu
 				String message = getPart(parts, 1);
 				return new ProtocolPacket(packetType, message);
 				//TODO Logs.error("Błąd protokołu: " + message);
 			}
-			break;
 			case INVALID_STATE: { // 14. Niespójność - błąd stanu
 				String message = getPart(parts, 1);
 				return new ProtocolPacket(packetType, message);
 				//TODO Logs.error("Błąd stanu: " + message);
 			}
-			break;
 			
 			default:
 				throw new ParseException("Invalid packet type received by server: " + code, 1);

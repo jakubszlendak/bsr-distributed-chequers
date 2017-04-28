@@ -9,6 +9,7 @@ import bsr.project.checkers.dispatcher.IEventObserver;
 import bsr.project.checkers.events.PacketReceivedEvent;
 import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.protocol.PacketsParser;
+import bsr.project.checkers.protocol.ProtocolPacket;
 import bsr.project.checkers.server.ServerData;
 
 public class PacketsController implements IEventObserver {
@@ -38,10 +39,10 @@ public class PacketsController implements IEventObserver {
 		Logs.info("packet received from " + clientData.getHostname() + ": " + received);
 		
 		try {
-			packetsParser.parsePacket(received, serverData, clientData);
+			ProtocolPacket packet = packetsParser.parsePacket(received);
 		} catch (ParseException e) {
-			Logs.error("Received packet has invalid format", e);
-			//TODO send message - error
+			Logs.error("Received packet is invalid", e);
+			//TODO send message - error or invalid state
 		}
 	}
 }
