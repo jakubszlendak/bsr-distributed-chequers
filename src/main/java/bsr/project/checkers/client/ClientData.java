@@ -34,4 +34,15 @@ public class ClientData {
 	public String getHostname() {
 		return clientConnection.getHostname();
 	}
+
+	/**
+	 * @return czy gracz jest gotowy na nową grę
+	 */
+	public boolean isReadyForNewGame() {
+		return state == LOGGED_IN;
+	}
+
+	public String getLogin() {
+		return login;
+	}
 }
