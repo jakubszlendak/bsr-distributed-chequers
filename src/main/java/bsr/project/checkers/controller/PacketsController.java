@@ -13,6 +13,8 @@ import bsr.project.checkers.protocol.ProtocolPacket;
 import bsr.project.checkers.server.ServerData;
 import bsr.project.checkers.users.UsersDatabase;
 import bsr.project.checkers.protocol.PacketsBuilder;
+import bsr.project.checkers.client.ClientConnectionThread;
+import bsr.project.checkers.client.ClientState;
 
 public class PacketsController implements IEventObserver {
 	
@@ -39,7 +41,12 @@ public class PacketsController implements IEventObserver {
 	}
 
 	private void sendPacket(ClientData client, String packetStr) {
-
+		try{
+			ClientConnectionThread clientConnection = client.getClientConnection();
+			clientConnection.sendLine(packetStr);
+		}catch(IllegalStateException e){
+			Logs.error(e.getMessage());
+		}
 	}
 	
 	private void packetReceived(ClientData client, String received) {
@@ -50,17 +57,21 @@ public class PacketsController implements IEventObserver {
 			ProtocolPacket packet = parser.parsePacket(received);
 			switch(packet.getType()){
 				case CREATE_ACCOUNT:{
+					checkState(client, ClientState.NOT_LOGGED_IN);
 					if (createAccount(client, packet)){
-						sendPacket(client, builder.responseLogin(true)); // success
+						sendPacket(client, builder.responseCreateAccount(true)); // success
 					}else{
-						sendPacket(client, builder.responseLogin(false)); // failure
+						sendPacket(client, builder.responseCreateAccount(false)); // failure
 					}
 				}
 				break;
 			}
+		} catch (InvalidClientStateException e){
+			// client has invalid state
+			sendPacket(client, builder.requestInvalidState(e.getMessage()));
 		} catch (ParseException | IllegalArgumentException e) {
 			Logs.error("Received packet is invalid: " + e.getMessage());
-			//TODO send message - error or invalid state
+			sendError(client, e.getMessage());
 		}
 	}
 
@@ -86,5 +97,17 @@ public class PacketsController implements IEventObserver {
 
 		userDb.addUser(login, password);
 		return true;
+	}
+
+	private void sendError(ClientData client, String message){
+		sendPacket(client, builder.requestProtocolError(message));
+	}
+
+	private void checkState(ClientData client, ClientState... allowedStates) throws InvalidClientStateException {
+		for (ClientState allowedState : allowedStates){
+			if (client.getState() == allowedState) // client state is correct
+				return;
+		}
+		throw new InvalidClientStateException("Invalid client state: " + client.getState().name());
 	}
 }

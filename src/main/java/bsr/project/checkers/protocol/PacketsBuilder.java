@@ -25,7 +25,13 @@ public class PacketsBuilder {
 	}
 
 	private String buildPacket(PacketType type, Object... parameters){
-		return join(type.getCode(), parameters);
+		// prepend type code to parameters array
+		List<Object> objs = new ArrayList<>();
+		objs.add(type.getCode());
+		for(Object obj : parameters){
+			objs.add(obj);
+		}
+		return join(objs.toArray(new Object[objs.size()]));
 	}
 	
 	/**
@@ -40,7 +46,7 @@ public class PacketsBuilder {
 	 * 2. Rejestracja - Utworzenie konta w systemie
 	 * @param result 1 w przypadku powodzenia, 0 w przypadku niepowodzenia
 	 */
-	public String resonseCreateAccount(boolean result){
+	public String responseCreateAccount(boolean result){
 		return buildPacket(PacketType.CREATE_ACCOUNT, result ? "1" : "0");
 	}
 
