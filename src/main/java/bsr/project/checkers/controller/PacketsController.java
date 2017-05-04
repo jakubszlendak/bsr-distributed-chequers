@@ -1,6 +1,7 @@
 package bsr.project.checkers.controller;
 
 import java.text.ParseException;
+import java.util.List;
 
 import bsr.project.checkers.client.ClientData;
 import bsr.project.checkers.dispatcher.AbstractEvent;
@@ -73,6 +74,11 @@ public class PacketsController implements IEventObserver {
 					logOut(client);
 				}
 				break;
+				case LIST_PLAYERS:{
+					checkState(client, ClientState.LOGGED_IN);
+					listPlayers(client);
+				}
+				break;
 			}
 		} catch (InvalidClientStateException e){
 			// client state is invalid
@@ -81,6 +87,8 @@ public class PacketsController implements IEventObserver {
 		} catch (ParseException | IllegalArgumentException e) {
 			Logs.error("Received packet is invalid: " + e.getMessage());
 			sendError(client, e.getMessage());
+		} catch (Throwable e) {
+			Logs.error(e);
 		}
 	}
 
@@ -135,6 +143,11 @@ public class PacketsController implements IEventObserver {
 			Logs.warn("Given password is not correct");
 			return false;
 		}
+		// check if already logged in
+		if (serverData.getClients().stream().anyMatch(user -> user.getLogin() != null && user.getLogin().equals(login))){
+			Logs.warn("User " + login + " is already logged in");
+			return false;
+		}
 		
 		client.setState(ClientState.LOGGED_IN);
 		client.setLogin(login);
@@ -147,5 +160,10 @@ public class PacketsController implements IEventObserver {
 		Logs.info("User " + client.getLogin() + " logged out.");
 		client.setState(ClientState.NOT_LOGGED_IN);
 		client.setLogin(null);
+	}
+
+	private void listPlayers(ClientData client){
+		List<ClientData> clients = serverData.getClients();
+		sendPacket(client, builder.responseListPlayers(clients));
 	}
 }

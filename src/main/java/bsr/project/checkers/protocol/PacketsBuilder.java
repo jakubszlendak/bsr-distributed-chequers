@@ -58,12 +58,14 @@ public class PacketsBuilder {
 		List<String> params = new ArrayList<>();
 		// dla każdego gracza kolejno zwracana para nazwa / status, gdzie status równy A – oznacza gracza gotowego na grę, status B – oznacza gracza zajętego / w trakcie negocjacji / ogólnie nie gotowego na przyjęcie zaproszenia
 		for (ClientData client : clients){
-			params.add(client.getLogin()); // nazwa
-			// status równy A – oznacza gracza gotowego na grę, status B – oznacza gracza zajętego
-			String status = client.isReadyForNewGame() ? "A" : "B";
-			params.add(status); 
+			if (client.getLogin() != null){
+				params.add(client.getLogin()); // nazwa
+				// status równy A – oznacza gracza gotowego na grę, status B – oznacza gracza zajętego
+				String status = client.isReadyForNewGame() ? "A" : "B";
+				params.add(status);
+			}
 		}
-		return buildPacket(PacketType.LIST_PLAYERS, params);
+		return buildPacket(PacketType.LIST_PLAYERS, params.toArray(new String[params.size()]));
 	}
 
 	/**

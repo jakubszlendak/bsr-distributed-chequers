@@ -38,7 +38,7 @@ public class ClientData {
 	 * @return czy gracz jest gotowy na nową grę
 	 */
 	public boolean isReadyForNewGame() {
-		return state == ClientState.LOGGED_IN;
+		return isConnected() && state == ClientState.LOGGED_IN;
 	}
 
 	public String getLogin() {
