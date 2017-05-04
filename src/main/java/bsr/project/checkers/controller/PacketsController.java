@@ -58,16 +58,20 @@ public class PacketsController implements IEventObserver {
 			switch(packet.getType()){
 				case CREATE_ACCOUNT:{
 					checkState(client, ClientState.NOT_LOGGED_IN);
-					if (createAccount(client, packet)){
-						sendPacket(client, builder.responseCreateAccount(true)); // success
-					}else{
-						sendPacket(client, builder.responseCreateAccount(false)); // failure
-					}
+					boolean result = createAccount(client, packet);
+					sendPacket(client, builder.responseCreateAccount(result));
+				}
+				break;
+				case LOG_IN:{
+					checkState(client, ClientState.NOT_LOGGED_IN);
+					boolean result = tryLogIn(client, packet);
+					sendPacket(client, builder.responseLogin(result));
 				}
 				break;
 			}
 		} catch (InvalidClientStateException e){
-			// client has invalid state
+			// client state is invalid
+			Logs.error(e.getMessage());
 			sendPacket(client, builder.requestInvalidState(e.getMessage()));
 		} catch (ParseException | IllegalArgumentException e) {
 			Logs.error("Received packet is invalid: " + e.getMessage());
@@ -83,19 +87,40 @@ public class PacketsController implements IEventObserver {
 		UsersDatabase userDb = serverData.getUsersDatabase();
 
 		if (login.contains("#") || login.isEmpty()){
-			Logs.error("invalid login");
+			Logs.warn("invalid login");
 			return false;
 		}
 		if (userDb.userExists(login)){
-			Logs.error("User " + login + " already exists");
+			Logs.warn("User " + login + " already exists");
 			return false;
 		}
 		if (password.contains("#") || password.isEmpty()){
-			Logs.error("invalid password");
+			Logs.warn("invalid password");
 			return false;
 		}
 
 		userDb.addUser(login, password);
+		return true;
+	}
+
+	private boolean tryLogIn(ClientData client, ProtocolPacket packet){
+		String login = packet.getParameter(0, String.class);
+		String password = packet.getParameter(0, String.class);
+		
+		UsersDatabase userDb = serverData.getUsersDatabase();
+
+		if (!userDb.userExists(login)){
+			Logs.warn("User " + login + " does not exist");
+			return false;
+		}
+		if (!userDb.passwordValid(login, password)){
+			Logs.warn("Given password is not correct");
+			return false;
+		}
+		
+		client.setState(ClientState.LOGGED_IN);
+
+		Logs.info("User " + login + " logged in.");
 		return true;
 	}
 
