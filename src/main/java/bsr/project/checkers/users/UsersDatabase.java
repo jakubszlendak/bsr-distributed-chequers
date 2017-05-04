@@ -1,4 +1,4 @@
-package bsr.project.checkers.db.users;
+package bsr.project.checkers.users;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

@@ -1,4 +1,4 @@
-package bsr.project.checkers.network;
+package bsr.project.checkers.controller;
 
 import java.text.ParseException;
 
@@ -11,7 +11,7 @@ import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.protocol.PacketsParser;
 import bsr.project.checkers.protocol.ProtocolPacket;
 import bsr.project.checkers.server.ServerData;
-import bsr.project.checkers.db.users.UsersDatabase;
+import bsr.project.checkers.users.UsersDatabase;
 import bsr.project.checkers.protocol.PacketsBuilder;
 
 public class PacketsController implements IEventObserver {

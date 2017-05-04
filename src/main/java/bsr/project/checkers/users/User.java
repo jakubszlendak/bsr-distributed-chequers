@@ -1,4 +1,4 @@
-package bsr.project.checkers.db.users;
+package bsr.project.checkers.users;
 
 public class User {
     

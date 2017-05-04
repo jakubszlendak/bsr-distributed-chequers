@@ -1,7 +1,6 @@
 package bsr.project.checkers.client;
 
 import bsr.project.checkers.game.GameSession;
-import bsr.project.checkers.network.ClientConnectionThread;
 
 public class ClientData {
 	

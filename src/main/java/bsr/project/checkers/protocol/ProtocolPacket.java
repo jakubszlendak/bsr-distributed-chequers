@@ -24,6 +24,7 @@ public class ProtocolPacket {
 		return parameters;
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T> T getParameter(int index, Class<T> clazz){
 		if (index < 0 || index >= parameters.size())
 			throw new IllegalArgumentException("invalid parameter index");

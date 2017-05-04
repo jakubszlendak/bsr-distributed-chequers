@@ -1,4 +1,4 @@
-package bsr.project.checkers.network;
+package bsr.project.checkers.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;

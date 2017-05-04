@@ -5,7 +5,7 @@ import java.util.List;
 
 import bsr.project.checkers.client.ClientData;
 import bsr.project.checkers.config.Configuration;
-import bsr.project.checkers.db.users.UsersDatabase;
+import bsr.project.checkers.users.UsersDatabase;
 import bsr.project.checkers.game.GameSession;
 
 public class ServerData {

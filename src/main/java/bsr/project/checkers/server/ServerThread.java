@@ -1,4 +1,4 @@
-package bsr.project.checkers.network;
+package bsr.project.checkers.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -11,6 +11,7 @@ import bsr.project.checkers.dispatcher.IEventObserver;
 import bsr.project.checkers.events.ServerCloseEvent;
 import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.server.ServerData;
+import bsr.project.checkers.client.ClientConnectionThread;
 
 public class ServerThread extends Thread implements IEventObserver {
 	
