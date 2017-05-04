@@ -16,6 +16,7 @@ import bsr.project.checkers.users.UsersDatabase;
 import bsr.project.checkers.protocol.PacketsBuilder;
 import bsr.project.checkers.client.ClientConnectionThread;
 import bsr.project.checkers.client.ClientState;
+import bsr.project.checkers.game.GameInvitation;
 
 public class PacketsController implements IEventObserver {
 	
@@ -79,13 +80,22 @@ public class PacketsController implements IEventObserver {
 					listPlayers(client);
 				}
 				break;
+				case CREATE_REQUEST_FOR_GAME:{
+					checkState(client, ClientState.LOGGED_IN);
+					createInvitation(client, packet);
+				}
+				break;
 			}
 		} catch (InvalidClientStateException e){
 			// client state is invalid
 			Logs.error(e.getMessage());
 			sendPacket(client, builder.requestInvalidState(e.getMessage()));
+		} catch (ProtocolErrorException e) {
+			Logs.error("Protocol error: " + e.getMessage());
+			sendError(client, e.getMessage());
 		} catch (ParseException | IllegalArgumentException e) {
-			Logs.error("Received packet is invalid: " + e.getMessage());
+			// invalid format
+			Logs.error("Invalid received packet format: " + e.getMessage());
 			sendError(client, e.getMessage());
 		} catch (Throwable e) {
 			Logs.error(e);
@@ -144,7 +154,7 @@ public class PacketsController implements IEventObserver {
 			return false;
 		}
 		// check if already logged in
-		if (serverData.getClients().stream().anyMatch(user -> user.getLogin() != null && user.getLogin().equals(login))){
+		if (serverData.getLoggedClient(login) != null){
 			Logs.warn("User " + login + " is already logged in");
 			return false;
 		}
@@ -165,5 +175,37 @@ public class PacketsController implements IEventObserver {
 	private void listPlayers(ClientData client){
 		List<ClientData> clients = serverData.getClients();
 		sendPacket(client, builder.responseListPlayers(clients));
+	}
+
+	private void createInvitation(ClientData client, ProtocolPacket packet) throws ProtocolErrorException {
+		String foreignLogin = packet.getParameter(0, String.class);
+
+		ClientData foreignClient = serverData.getLoggedClient(foreignLogin);
+
+		if (foreignClient == null){
+			Logs.warn("User " + foreignLogin + " does not exist");
+			sendPacket(client, builder.responseCreateRequestForGame(false));
+			return;
+		}
+
+		if (foreignClient == client){
+			throw new ProtocolErrorException("Cannot invite yourself!");
+		}
+
+		if (foreignClient.getState() != ClientState.LOGGED_IN){
+			throw new ProtocolErrorException("Requested client is not waiting for invitations");
+		}
+
+		// remember new invitation
+		serverData.getInvitations().add(new GameInvitation(client, foreignClient));
+		// send result to inviting user
+		sendPacket(client, builder.responseCreateRequestForGame(true));
+		// send INVITATION_FOR_GAME to another user
+		sendPacket(foreignClient, builder.requestInvitationForGame(client.getLogin()));
+		// change players states
+		client.setState(ClientState.WAITING_FOR_ACCEPT);
+		foreignClient.setState(ClientState.GAME_REQUEST);
+
+		Logs.info("Invitation has been created: " + client.getLogin() + " -> " + foreignClient.getLogin());
 	}
 }

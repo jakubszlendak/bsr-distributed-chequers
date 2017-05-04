@@ -101,9 +101,6 @@ public class UsersDatabase {
 	}
 	
 	public synchronized void addUser(String login, String password) {
-		
-		//TODO ochrona przed dodawaniem loginu lub hasła zawierającego znak specjalny #
-		
 		if (!userExists(login)) {
 			String hashed = hashPassword(password);
 			users.add(new User(login, hashed));

@@ -39,4 +39,13 @@ public class GameSession {
 	private boolean hasBlackWon() {
 		return board.countSymbols(BoardSymbols.WHITE_PAWN, BoardSymbols.WHITE_KING) == 0;
 	}
+
+	public ClientData getPlayer1(){
+		return player1;
+	}
+	
+	public ClientData getPlayer2(){
+		return player2;
+	}
+
 }
