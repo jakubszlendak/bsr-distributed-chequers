@@ -68,6 +68,11 @@ public class PacketsController implements IEventObserver {
 					sendPacket(client, builder.responseLogin(result));
 				}
 				break;
+				case LOG_OUT:{
+					checkState(client, ClientState.LOGGED_IN, ClientState.WAITING_FOR_ACCEPT, ClientState.GAME_REQUEST);
+					logOut(client);
+				}
+				break;
 			}
 		} catch (InvalidClientStateException e){
 			// client state is invalid
@@ -80,9 +85,22 @@ public class PacketsController implements IEventObserver {
 	}
 
 
+	private void sendError(ClientData client, String message){
+		sendPacket(client, builder.requestProtocolError(message));
+	}
+
+	private void checkState(ClientData client, ClientState... allowedStates) throws InvalidClientStateException {
+		for (ClientState allowedState : allowedStates){
+			if (client.getState() == allowedState) // client state is correct
+				return;
+		}
+		throw new InvalidClientStateException("Invalid client state: " + client.getState().name());
+	}
+
+
 	private boolean createAccount(ClientData client, ProtocolPacket packet){
 		String login = packet.getParameter(0, String.class);
-		String password = packet.getParameter(0, String.class);
+		String password = packet.getParameter(1, String.class);
 		
 		UsersDatabase userDb = serverData.getUsersDatabase();
 
@@ -105,7 +123,7 @@ public class PacketsController implements IEventObserver {
 
 	private boolean tryLogIn(ClientData client, ProtocolPacket packet){
 		String login = packet.getParameter(0, String.class);
-		String password = packet.getParameter(0, String.class);
+		String password = packet.getParameter(1, String.class);
 		
 		UsersDatabase userDb = serverData.getUsersDatabase();
 
@@ -119,20 +137,15 @@ public class PacketsController implements IEventObserver {
 		}
 		
 		client.setState(ClientState.LOGGED_IN);
+		client.setLogin(login);
 
 		Logs.info("User " + login + " logged in.");
 		return true;
 	}
 
-	private void sendError(ClientData client, String message){
-		sendPacket(client, builder.requestProtocolError(message));
-	}
-
-	private void checkState(ClientData client, ClientState... allowedStates) throws InvalidClientStateException {
-		for (ClientState allowedState : allowedStates){
-			if (client.getState() == allowedState) // client state is correct
-				return;
-		}
-		throw new InvalidClientStateException("Invalid client state: " + client.getState().name());
+	private void logOut(ClientData client){
+		Logs.info("User " + client.getLogin() + " logged out.");
+		client.setState(ClientState.NOT_LOGGED_IN);
+		client.setLogin(null);
 	}
 }
