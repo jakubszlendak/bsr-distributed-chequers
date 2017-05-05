@@ -53,21 +53,21 @@ public class PacketsController implements IEventObserver {
 	
 	private void packetReceived(ClientData client, String received) {
 		
-		Logs.debug("packet received from " + client.getHostname() + ": " + received);
+		// Logs.debug("packet received from " + client.getHostname() + ": " + received);
 		
 		try {
 			ProtocolPacket packet = parser.parsePacket(received);
 			switch(packet.getType()){
-				case CREATE_ACCOUNT:{
-					checkState(client, ClientState.NOT_LOGGED_IN);
-					boolean result = createAccount(client, packet);
-					sendPacket(client, builder.responseCreateAccount(result));
-				}
-				break;
 				case LOG_IN:{
 					checkState(client, ClientState.NOT_LOGGED_IN);
 					boolean result = tryLogIn(client, packet);
 					sendPacket(client, builder.responseLogin(result));
+				}
+				break;
+				case CREATE_ACCOUNT:{
+					checkState(client, ClientState.NOT_LOGGED_IN);
+					boolean result = createAccount(client, packet);
+					sendPacket(client, builder.responseCreateAccount(result));
 				}
 				break;
 				case LOG_OUT:{
@@ -83,6 +83,21 @@ public class PacketsController implements IEventObserver {
 				case CREATE_REQUEST_FOR_GAME:{
 					checkState(client, ClientState.LOGGED_IN);
 					createInvitation(client, packet);
+				}
+				break;
+				case INVITATION_FOR_GAME:{
+					checkState(client, ClientState.GAME_REQUEST);
+					receivedInvitationResponse(client, packet);
+				}
+				break;
+				case ERROR:{
+					String message = packet.getParameter(0, String.class);
+					Logs.error("Protocol error received: " + message);
+				}
+				break;
+				case INVALID_STATE:{
+					String message = packet.getParameter(0, String.class);
+					Logs.error("State error received: " + message);
 				}
 				break;
 			}
@@ -154,7 +169,7 @@ public class PacketsController implements IEventObserver {
 			return false;
 		}
 		// check if already logged in
-		if (serverData.getLoggedClient(login) != null){
+		if (serverData.findLoggedClient(login) != null){
 			Logs.warn("User " + login + " is already logged in");
 			return false;
 		}
@@ -180,7 +195,7 @@ public class PacketsController implements IEventObserver {
 	private void createInvitation(ClientData client, ProtocolPacket packet) throws ProtocolErrorException {
 		String foreignLogin = packet.getParameter(0, String.class);
 
-		ClientData foreignClient = serverData.getLoggedClient(foreignLogin);
+		ClientData foreignClient = serverData.findLoggedClient(foreignLogin);
 
 		if (foreignClient == null){
 			Logs.warn("User " + foreignLogin + " does not exist");
@@ -188,13 +203,14 @@ public class PacketsController implements IEventObserver {
 			return;
 		}
 
-		if (foreignClient == client){
+		if (foreignClient == client)
 			throw new ProtocolErrorException("Cannot invite yourself!");
-		}
 
-		if (foreignClient.getState() != ClientState.LOGGED_IN){
+		if (foreignClient.getState() != ClientState.LOGGED_IN)
 			throw new ProtocolErrorException("Requested client is not waiting for invitations");
-		}
+		
+		if (serverData.findInvitation(foreignClient) != null)
+			throw new ProtocolErrorException("Requested client is already invited");
 
 		// remember new invitation
 		serverData.getInvitations().add(new GameInvitation(client, foreignClient));
@@ -207,5 +223,39 @@ public class PacketsController implements IEventObserver {
 		foreignClient.setState(ClientState.GAME_REQUEST);
 
 		Logs.info("Invitation has been created: " + client.getLogin() + " -> " + foreignClient.getLogin());
+	}
+
+	private void receivedInvitationResponse(ClientData client, ProtocolPacket packet) throws ProtocolErrorException {
+		Boolean agreed = packet.getParameter(0, Boolean.class);
+
+		GameInvitation invitation = serverData.findInvitation(client);
+
+		if (invitation == null)
+			throw new ProtocolErrorException("Player is not invited");
+
+		// remove invitation from list
+		serverData.removeInvitation(invitation);
+
+		// sending response for inviting player
+		sendPacket(invitation.sender, builder.requestResponseForInvitation(agreed));
+
+		Logs.info("Received response for invitation from player " + client + ": " + agreed);
+
+		if (agreed){
+			newGame(invitation.sender, invitation.receiver);
+		} else {
+			invitation.sender.setState(ClientState.LOGGED_IN);
+			invitation.receiver.setState(ClientState.LOGGED_IN);
+		}
+	}
+
+	private void newGame(ClientData player1, ClientData player2){
+		Logs.info("Creating new game session: " + player1 + " vs " + player2);
+		// TODO create new game
+		// TODO change players states
+		// TODO add new game to game sessions
+		// TODO send new game message
+		// TODO send board to players
+		// TODO send Your move
 	}
 }

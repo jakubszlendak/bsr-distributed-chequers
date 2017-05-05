@@ -2,6 +2,7 @@ package bsr.project.checkers.logger;
 
 public class Logs {
 	
+	// CONFIG
 	private static final LogLevel CONSOLE_LEVEL = LogLevel.ALL;
 	private static final LogLevel SHOW_TRACE_DETAILS_LEVEL = LogLevel.TRACE;
 	private static final boolean SHOW_EXCEPTIONS_TRACE = true;
@@ -29,11 +30,13 @@ public class Logs {
 	}
 	
 	public static void error(Throwable ex) {
-		if (SHOW_EXCEPTIONS_TRACE) {
-			synchronized(PRINT_LOCK){
+		synchronized(PRINT_LOCK){
+			if (SHOW_EXCEPTIONS_TRACE) {
 				System.out.print(C_BOLD + C_RED + "[ERROR] " + C_RESET);
 				ex.printStackTrace();
 				System.out.print(C_RESET);
+			} else {
+				log(ex.getMessage(), LogLevel.ERROR, C_BOLD + C_RED + "[ERROR] " + C_RESET);
 			}
 		}
 	}
@@ -103,8 +106,8 @@ public class Logs {
 	}
 	
 	public static void printStackTrace() {
-		int i = 0;
 		synchronized(PRINT_LOCK){
+			int i = 0;
 			for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
 				i++;
 				if (i <= 3) continue;

@@ -72,10 +72,23 @@ public class ServerData {
   			.collect(Collectors.toList());
 	}
 
-	public synchronized ClientData getLoggedClient(String login){
+	public synchronized ClientData findLoggedClient(String login){
 		return clients.stream()
 			.filter(client -> client.getLogin() != null && client.getLogin().equals(login))
 			.findFirst()
 			.orElse(null); // null if not found
 	}
+
+	public synchronized GameInvitation findInvitation(ClientData invited){
+		return invitations.stream()
+			.filter(inv -> inv.receiver == invited)
+			.findFirst()
+			.orElse(null); // null if not found
+	}
+
+	public synchronized void removeInvitation(GameInvitation invitation) {
+		invitations.remove(invitation);
+	}
+
+	
 }

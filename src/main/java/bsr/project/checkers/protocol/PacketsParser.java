@@ -13,7 +13,7 @@ public class PacketsParser {
 	
 	private String getPart(String[] parts, int index) throws ParseException {
 		if (index >= parts.length)
-			throw new ParseException("not enough parameters", 1);
+			throw new ParseException("not enough parameters", 0);
 		return parts[index];
 	}
 	
@@ -64,22 +64,22 @@ public class PacketsParser {
 			case INVITATION_FOR_GAME: { // 5. Pytanie o grę - przekazanie prośby o rozpoczęcie nowej gry
 				// 1 – zgoda, 0 – brak zgody
 				String decision = getPart(parts, 1);
-				boolean agreed = decision.equals("1");
+				if (!decision.equals("1") && !decision.equals("0"))
+					throw new ParseException("Invalid decision format: " + decision, 0);
+				Boolean agreed = decision.equals("1");
 				return new ProtocolPacket(packetType, agreed);
 			}
 			case ERROR: { // 13. Błąd protokołu
 				String message = getPart(parts, 1);
 				return new ProtocolPacket(packetType, message);
-				//TODO Logs.error("Błąd protokołu: " + message);
 			}
 			case INVALID_STATE: { // 14. Niespójność - błąd stanu
 				String message = getPart(parts, 1);
 				return new ProtocolPacket(packetType, message);
-				//TODO Logs.error("Błąd stanu: " + message);
 			}
 			
 			default:
-				throw new ParseException("Invalid packet type: " + code, 1);
+				throw new ParseException("Invalid packet type: " + code, 0);
 				// TODO send protocol error
 		}
 		
