@@ -3,6 +3,7 @@ package bsr.project.checkers.protocol;
 import java.text.ParseException;
 
 import bsr.project.checkers.logger.Logs;
+import bsr.project.checkers.game.Point;
 
 /**
  * narzędzie do parsowania odebranych pakietów
@@ -15,6 +16,15 @@ public class PacketsParser {
 		if (index >= parts.length)
 			throw new ParseException("not enough parameters", 0);
 		return parts[index];
+	}
+
+	private int getPartInt(String[] parts, int index) throws ParseException {
+		String numberStr = getPart(parts, index);
+		try{
+			return Integer.parseInt(numberStr);
+		}catch(NumberFormatException e){
+			throw new ParseException("invalid number format: " + numberStr, 0);
+		}
 	}
 	
 	public ProtocolPacket parsePacket(String packetStr) throws ParseException {
@@ -60,6 +70,13 @@ public class PacketsParser {
 			case LOG_OUT: { // 12. Wylogowanie - koniec komunikacji
 				return new ProtocolPacket(packetType);
 			}
+			case MAKE_MOVE: { // 15. Wykonanie ruchu
+				int xFrom = getPartInt(parts, 1);
+				int yFrom = getPartInt(parts, 2);
+				int xTo = getPartInt(parts, 3);
+				int yTo = getPartInt(parts, 4);
+				return new ProtocolPacket(packetType, new Point(xFrom, yFrom), new Point(xTo, yTo));
+			}
 			// odpowiedzi na pakiety z kierunku Server -> Client
 			case INVITATION_FOR_GAME: { // 5. Pytanie o grę - przekazanie prośby o rozpoczęcie nowej gry
 				// 1 – zgoda, 0 – brak zgody
@@ -80,7 +97,6 @@ public class PacketsParser {
 			
 			default:
 				throw new ParseException("Invalid packet type: " + code, 0);
-				// TODO send protocol error
 		}
 		
 	}

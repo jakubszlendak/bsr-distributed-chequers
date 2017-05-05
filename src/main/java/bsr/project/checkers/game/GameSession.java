@@ -48,4 +48,15 @@ public class GameSession {
 		return player2;
 	}
 
+	public Board getBoard(){
+		return board;
+	}
+
+	public ClientData getCurrentPlayer(){
+		return currentPlayer == BoardSymbols.WHITE_PAWN ? player1 : player2;
+	}
+
+	public ClientData getOpponent(ClientData player){
+		return player1 == player ? player2 : player1;
+	}
 }

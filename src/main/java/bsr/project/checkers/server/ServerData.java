@@ -31,19 +31,17 @@ public class ServerData {
 	public UsersDatabase getUsersDatabase() {
 		return usersDatabase;
 	}
-	
+
+	/* CLIENTS */
 	public synchronized List<ClientData> getClients() {
 		return clients;
 	}
-	
-	public synchronized List<GameSession> getGames() {
-		refreshGames();
-		return games;
-	}
 
-	public synchronized List<GameInvitation> getInvitations() {
-		refreshInvitations();
-		return invitations;
+	public synchronized ClientData findLoggedClient(String login){
+		return clients.stream()
+			.filter(client -> client.getLogin() != null && client.getLogin().equals(login))
+			.findFirst()
+			.orElse(null); // null if not found
 	}
 	
 	public synchronized void addClient(ClientData clientData) {
@@ -54,13 +52,10 @@ public class ServerData {
 		clients.remove(clientData);
 	}
 
-	private synchronized void refreshGames(){
-		games = games.stream()
-			.filter(game -> game.getPlayer1() != null
-				&& game.getPlayer2() != null
-				&& clients.contains(game.getPlayer1())
-				&& clients.contains(game.getPlayer2()))
-  			.collect(Collectors.toList());
+	/* INVITATIONS */
+	public synchronized List<GameInvitation> getInvitations() {
+		refreshInvitations();
+		return invitations;
 	}
 
 	private synchronized void refreshInvitations(){
@@ -69,17 +64,11 @@ public class ServerData {
 				&& inv.receiver != null
 				&& clients.contains(inv.sender)
 				&& clients.contains(inv.receiver))
-  			.collect(Collectors.toList());
+			.collect(Collectors.toList());
 	}
-
-	public synchronized ClientData findLoggedClient(String login){
-		return clients.stream()
-			.filter(client -> client.getLogin() != null && client.getLogin().equals(login))
-			.findFirst()
-			.orElse(null); // null if not found
-	}
-
+	
 	public synchronized GameInvitation findInvitation(ClientData invited){
+		refreshInvitations();
 		return invitations.stream()
 			.filter(inv -> inv.receiver == invited)
 			.findFirst()
@@ -90,5 +79,35 @@ public class ServerData {
 		invitations.remove(invitation);
 	}
 
-	
+	/* GAME SESSIONS */
+	public synchronized List<GameSession> getGames() {
+		refreshGames();
+		return games;
+	}
+
+	private synchronized void refreshGames(){
+		games = games.stream()
+			.filter(game -> game.getPlayer1() != null
+				&& game.getPlayer2() != null
+				&& clients.contains(game.getPlayer1())
+				&& clients.contains(game.getPlayer2()))
+			.collect(Collectors.toList());
+	}
+
+	public synchronized GameSession findGame(ClientData player){
+		refreshGames();
+		return games.stream()
+			.filter(game -> game.getPlayer1() == player || game.getPlayer2() == player)
+			.findFirst()
+			.orElse(null); // null if not found
+	}
+
+	public synchronized void addGame(GameSession game) {
+		games.add(game);
+	}
+
+	public synchronized void removeGame(GameSession game) {
+		games.remove(game);
+	}
+
 }

@@ -14,9 +14,11 @@ import bsr.project.checkers.protocol.ProtocolPacket;
 import bsr.project.checkers.server.ServerData;
 import bsr.project.checkers.users.UsersDatabase;
 import bsr.project.checkers.protocol.PacketsBuilder;
+import bsr.project.checkers.protocol.BoardSymbols;
 import bsr.project.checkers.client.ClientConnectionThread;
 import bsr.project.checkers.client.ClientState;
 import bsr.project.checkers.game.GameInvitation;
+import bsr.project.checkers.game.GameSession;
 
 public class PacketsController implements IEventObserver {
 	
@@ -88,6 +90,11 @@ public class PacketsController implements IEventObserver {
 				case INVITATION_FOR_GAME:{
 					checkState(client, ClientState.GAME_REQUEST);
 					receivedInvitationResponse(client, packet);
+				}
+				break;
+				case GIVE_UP:{
+					checkState(client, ClientState.PLAYING_GAME);
+					giveUpGame(client);
 				}
 				break;
 				case ERROR:{
@@ -251,11 +258,46 @@ public class PacketsController implements IEventObserver {
 
 	private void newGame(ClientData player1, ClientData player2){
 		Logs.info("Creating new game session: " + player1 + " vs " + player2);
-		// TODO create new game
-		// TODO change players states
-		// TODO add new game to game sessions
-		// TODO send new game message
-		// TODO send board to players
-		// TODO send Your move
+		// create new game
+		GameSession game = new GameSession(player1, player2);
+		serverData.addGame(game);
+		// change players states
+		player1.setState(ClientState.PLAYING_GAME);
+		player2.setState(ClientState.PLAYING_GAME);
+		// send new game messages
+		sendPacket(player1, builder.requestNewGame(BoardSymbols.WHITE_PAWN));
+		sendPacket(player2, builder.requestNewGame(BoardSymbols.BLACK_PAWN));
+		// send board to players
+		sendBoards(game);
+		// send your move message to White player
+		sendPacket(player1, builder.requestYourMove());
+	}
+
+	private void sendBoards(GameSession game){
+		sendPacket(game.getPlayer1(), builder.requestChangedBoard(game.getBoard()));
+		sendPacket(game.getPlayer2(), builder.requestChangedBoard(game.getBoard()));
+	}
+
+	private void giveUpGame(ClientData client) throws ProtocolErrorException {
+		GameSession game = serverData.findGame(client);
+		if (game == null)
+			throw new ProtocolErrorException("game session with player was not found");
+
+		ClientData opponent = game.getOpponent(client);
+		gameOver(game, opponent, "Player " + client + " gave up");
+	}
+
+	private void gameOver(GameSession game, ClientData winner, String reason){
+		ClientData player1 = game.getPlayer1();
+		ClientData player2 = game.getPlayer2();
+		
+		player1.setState(ClientState.LOGGED_IN);
+		player2.setState(ClientState.LOGGED_IN);
+
+		sendPacket(player1, builder.requestGameOver(winner.getLogin(), reason));
+		sendPacket(player2, builder.requestGameOver(winner.getLogin(), reason));
+
+		serverData.removeGame(game);
+		Logs.info("Game session " + player1 + " vs " + player2 + " has been terminated, winner: " + winner + ", reason: " + reason);
 	}
 }

@@ -104,7 +104,7 @@ public class ClientConnectionThread extends Thread {
 	}
 	
 	public synchronized void sendLine(String line) {
-		if (!active) throw new IllegalStateException("Client connection is not active");
+		if (!active) throw new IllegalStateException("Client connection is no longer active");
 		if (out == null) throw new IllegalStateException("No output stream");
 		out.println(line);
 		out.flush();

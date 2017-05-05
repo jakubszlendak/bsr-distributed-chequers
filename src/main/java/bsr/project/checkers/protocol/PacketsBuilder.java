@@ -141,4 +141,12 @@ public class PacketsBuilder {
 		return buildPacket(PacketType.INVALID_STATE, message);
 	}
 
+	/**
+	 * 15. Wykonanie ruchu
+	 * @param result 1 – prawidłowy ruch, 0 – nieprawidłowy ruch
+	 */
+	public String responseMakeMove(boolean result){
+		return buildPacket(PacketType.MAKE_MOVE, result ? "1" : "0");
+	}
+
 }

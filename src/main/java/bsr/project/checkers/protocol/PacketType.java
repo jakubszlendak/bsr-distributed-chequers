@@ -89,7 +89,15 @@ public enum PacketType {
 	 * 14. Niespójność - błąd stanu
 	 * Request:  S -> C: message
 	 */
-	INVALID_STATE(14, "ERS");
+	INVALID_STATE(14, "ERS"),
+
+	/**
+	 * TODO brak w dokumentacji protokołu !!!
+	 * 15. Wykonanie ruchu
+	 * Request:  C -> S: xFrom + yFrom + xTo + yTo (współrzędne ruchu
+	 * Response: S -> C: result (1 – prawidłowy ruch, 0 – nieprawidłowy ruch)
+	 */
+	MAKE_MOVE(15, "MOV");
 
 
 	private int id;
