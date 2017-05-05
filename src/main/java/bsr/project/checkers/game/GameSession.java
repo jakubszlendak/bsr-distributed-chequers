@@ -36,7 +36,7 @@ public class GameSession {
 		
 		// TODO zamiana na damkę po przejściu na koniec
 
-		// remove all the pawns between source and target
+		// remove (beat) all the pawns between source and target
 		removePawnsBetween(source, target);
 		// update current player
 		if (!anotherMove){
@@ -47,7 +47,7 @@ public class GameSession {
 	}
 
 	private void removePawnsBetween(Point source, Point target){
-		List<Point> points = MoveValidator.pointsBetween(source, target);
+		List<Point> points = BoardLogic.pointsBetween(source, target);
 		for (Point p : points){
 			char cell = board.getCell(p);
 			if (cell != BoardSymbols.EMPTY){
