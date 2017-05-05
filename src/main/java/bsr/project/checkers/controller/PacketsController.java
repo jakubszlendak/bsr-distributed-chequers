@@ -317,7 +317,7 @@ public class PacketsController implements IEventObserver {
 			return;
 		}
 
-		// check whose move is next, send Your move message
+		// check whose move is next, send Your Move message
 		ClientData currentPlayer = game.getCurrentPlayer();
 		sendPacket(currentPlayer, builder.requestYourMove());
 	}

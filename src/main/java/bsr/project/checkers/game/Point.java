@@ -13,4 +13,8 @@ public class Point {
 	public boolean equals(Point p2){
 		return this.x == p2.x && this.y == p2.y;
 	}
+
+	public String toString(){
+		return "(" + x + "," + y + ")";
+	}
 }

@@ -1,5 +1,8 @@
 package bsr.project.checkers.game.validator;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import bsr.project.checkers.game.Board;
 import bsr.project.checkers.game.Point;
 import bsr.project.checkers.protocol.BoardSymbols;
@@ -49,18 +52,28 @@ public class MoveValidator {
 			throw new InvalidMoveException("only diagonal moves are allowed");
 
 		if (isPawn(sourceField)){
-			// TODO zwykły pionek
+			// zwykły pionek
 			if (dx > 2)
 				throw new InvalidMoveException("pawn cannot move by more than 2 fields");
-			if (dx == 1){
-				// TODO zwykły ruch
+			if (dx == 1){ // zwykły ruch do przodu
+				// pionek nie może się cofać
+				if (isMovingBackwards(sourceField, source, target))
+					throw new InvalidMoveException("pawn cannot move backwards");
+				// ruch poprawny - bez możliwości kolejnego ruchu
+				return false;
 
 			} else if (dx == 2){
-				// TODO bicie
+				// bicie pionka przeciwnika
+				Point between = pointBetween(source, target);
+				char betweenField = board.getCell(between);
+				// pionek pomiędzy musi być przeciwnego koloru
+				if(!isOppositeColor(sourceField, betweenField))
+					throw new InvalidMoveException("pawn can only jump over opponent's pawns");
+				// ruch poprawny
+
+				// TODO sprawdzenie, czy można bić w kolejnym ruchu
 
 			}
-
-
 		} else if (isKing(sourceField)){ 
 			// TODO damka
 
@@ -68,11 +81,15 @@ public class MoveValidator {
 
 		// TODO czy było bicie
 
-		// TODO czy gracz może wykonać kolejne bicie (kolejny ruch)
+			// TODO czy gracz może wykonać kolejne bicie (kolejny ruch)
+
+		// TODO lista legalnych ruchów, kopia mapy i symulacja
 
 		return false;
 		
 	}
+
+	// używane metody logiki planszy przenieść do utilsa: BoardLogic
 
 	private boolean isWhite(char field){
 		return field == BoardSymbols.WHITE_PAWN || field == BoardSymbols.WHITE_KING;
@@ -94,12 +111,6 @@ public class MoveValidator {
 		return field == BoardSymbols.EMPTY;
 	}
 
-	private Point pointBetween(Point p1, Point p2){
-		int x = (p1.x + p2.x) / 2;
-		int y = (p1.y + p2.y) / 2;
-		return new Point(x, y);
-	}
-
 	private boolean isSameColor(char field1, char field2){
 		if (isWhite(field1) && isWhite(field2))
 			return true;
@@ -108,8 +119,47 @@ public class MoveValidator {
 		return false;
 	}
 
-	private int abs(int number){
+	private boolean isOppositeColor(char field1, char field2){
+		if (isWhite(field1) && isBlack(field2))
+			return true;
+		if (isBlack(field1) && isWhite(field2))
+			return true;
+		return false;
+	}
+
+	private static int abs(int number){
 		return number >= 0 ? number : -number;
+	}
+
+	private Point pointBetween(Point p1, Point p2){
+		int x = (p1.x + p2.x) / 2;
+		int y = (p1.y + p2.y) / 2;
+		return new Point(x, y);
+	}
+
+	public static List<Point> pointsBetween(Point p1, Point p2){
+		List<Point> points = new ArrayList<>();
+
+		int dx = abs(p1.x - p2.x);
+		int dy = abs(p1.y - p2.y);
+
+		for (int i = 1; i < dx; i++) {
+			int x = p1.x + (p2.x - p1.x) * i / dx;
+			int y = p1.y + (p2.y - p1.y) * i / dy;
+			points.add(new Point(x, y));
+		}
+
+		return points;
+	}
+
+	private boolean isMovingBackwards(char field, Point source, Point target){
+		int dy = target.y - source.y; // dodatni kierunek - ruch w dół planszy (w kierunku białych)
+		if (isWhite(field)){
+			return dy > 0;
+		} else if(isBlack(field)){
+			return dy < 0;
+		}
+		return false;
 	}
 	
 }
