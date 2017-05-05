@@ -1,6 +1,6 @@
 package bsr.project.checkers;
 
-import bsr.project.checkers.console.ConsoleReader;
+import bsr.project.checkers.console.CommandLine;
 import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.controller.PacketsController;
 import bsr.project.checkers.server.ServerThread;
@@ -26,7 +26,7 @@ public class ServerApplication {
 			serverThread = new ServerThread(serverData);
 			serverThread.start();
 			
-			new ConsoleReader(serverData).readContinuously();
+			new CommandLine(serverData).readContinuously();
 			
 			serverThread.join();
 			Logs.info("Server closed");

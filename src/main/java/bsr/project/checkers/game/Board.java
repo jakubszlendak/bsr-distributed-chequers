@@ -66,6 +66,10 @@ public class Board {
 	public char getCell(Point p) {
 		return getCell(p.x, p.y);
 	}
+
+	public char[][] getMap(){
+		return map;
+	}
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

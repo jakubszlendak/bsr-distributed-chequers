@@ -19,8 +19,12 @@ import bsr.project.checkers.client.ClientConnectionThread;
 import bsr.project.checkers.client.ClientState;
 import bsr.project.checkers.game.GameInvitation;
 import bsr.project.checkers.game.GameSession;
+import bsr.project.checkers.game.Point;
+import bsr.project.checkers.game.Board;
 
 public class PacketsController implements IEventObserver {
+
+	private final boolean DEBUG_BOARD = true;
 	
 	private ServerData serverData;
 	private PacketsParser parser;
@@ -95,6 +99,11 @@ public class PacketsController implements IEventObserver {
 				case GIVE_UP:{
 					checkState(client, ClientState.PLAYING_GAME);
 					giveUpGame(client);
+				}
+				break;
+				case MAKE_MOVE:{
+					checkState(client, ClientState.PLAYING_GAME);
+					makeMove(client, packet);
 				}
 				break;
 				case ERROR:{
@@ -273,9 +282,54 @@ public class PacketsController implements IEventObserver {
 		sendPacket(player1, builder.requestYourMove());
 	}
 
+	private void makeMove(ClientData player, ProtocolPacket packet) throws ProtocolErrorException {
+		GameSession game = serverData.findGame(player);
+		if (game == null)
+			throw new ProtocolErrorException("game session with player was not found");
+
+		if (game.getCurrentPlayer() != player)
+			throw new ProtocolErrorException("wait for your turn!");
+
+		Point from = packet.getParameter(0, Point.class);
+		Point to = packet.getParameter(1, Point.class);
+
+		// TODO validate move
+
+		// TODO if not valid - send false response
+			sendPacket(player, builder.responseMakeMove(false));
+
+		// TODO if valid - make move
+		
+		sendPacket(player, builder.responseMakeMove(true));
+
+		// TODO send new board state
+		sendBoards(game);
+
+		// TODO check if there is game over
+
+		// TODO if yes - send gameover and exit
+
+		// TODO check whose move is next
+
+		// TODO send Your move to appropriate player
+
+	}
+
 	private void sendBoards(GameSession game){
 		sendPacket(game.getPlayer1(), builder.requestChangedBoard(game.getBoard()));
 		sendPacket(game.getPlayer2(), builder.requestChangedBoard(game.getBoard()));
+
+		if (DEBUG_BOARD){
+			Logs.debug("Current board:");
+			char[][] map = game.getBoard().getMap();
+			for (int y = 0; y < Board.BOARD_SIZE; y++) {
+				StringBuilder sb = new StringBuilder();
+				for (int x = 0; x < Board.BOARD_SIZE; x++) {
+					sb.append(map[x][y]);
+				}
+				Logs.debug(sb.toString());
+			}
+		}
 	}
 
 	private void giveUpGame(ClientData client) throws ProtocolErrorException {
@@ -290,7 +344,7 @@ public class PacketsController implements IEventObserver {
 	private void gameOver(GameSession game, ClientData winner, String reason){
 		ClientData player1 = game.getPlayer1();
 		ClientData player2 = game.getPlayer2();
-		
+
 		player1.setState(ClientState.LOGGED_IN);
 		player2.setState(ClientState.LOGGED_IN);
 
