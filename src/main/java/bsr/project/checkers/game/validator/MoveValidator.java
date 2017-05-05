@@ -78,6 +78,11 @@ public class MoveValidator {
 		} else if (BoardLogic.isKing(sourceField)){ 
 			// TODO damka
 
+			// TODO jeśli pomiędzy były własne pionki
+			
+			// TODO jeśli pomiędzy były pionki przeciwnika - było bicie
+
+
 		}
 
 		// TODO czy było bicie

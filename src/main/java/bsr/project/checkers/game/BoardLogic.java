@@ -33,6 +33,14 @@ public class BoardLogic {
 		return field == BoardSymbols.EMPTY;
 	}
 
+	public static char pawnToKing(char field){
+		if(field == BoardSymbols.WHITE_PAWN)
+			return BoardSymbols.WHITE_KING;
+		if(field == BoardSymbols.BLACK_PAWN)
+			return BoardSymbols.BLACK_KING;
+		return field;
+	}
+
 	public static boolean isSameColor(char field1, char field2){
 		if (isWhite(field1) && isWhite(field2))
 			return true;
@@ -80,6 +88,17 @@ public class BoardLogic {
 			return dy > 0;
 		} else if(isBlack(field)){
 			return dy < 0;
+		}
+		return false;
+	}
+
+	public static boolean isOnBoardEnd(char movingColor, Point p){
+		if (isWhite(movingColor)){
+			// dla białych - koniec planszy w y = 0
+			return p.y == 0;
+		} else if (isBlack(movingColor)){
+			// dla czarnych - koniec planszy na samym dole
+			return p.y == Board.BOARD_SIZE - 1;
 		}
 		return false;
 	}

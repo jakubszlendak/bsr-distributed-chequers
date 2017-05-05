@@ -29,12 +29,17 @@ public class GameSession {
 	public void executeMove(ClientData player, Point source, Point target) throws InvalidMoveException {
 		char playerColor = player == player1 ? BoardSymbols.WHITE_PAWN : BoardSymbols.BLACK_PAWN;
 		boolean anotherMove = validator.validateMove(playerColor, board, source, target);
-		// execute move
+		// move is valid - execute move
 		char moving = board.getCell(source);
 		board.setCell(target, moving);
 		board.setCell(source, BoardSymbols.EMPTY); // replace by empty field
 		
-		// TODO zamiana na damkę po przejściu na koniec
+		// pawn reached end of board
+		if(BoardLogic.isOnBoardEnd(playerColor, target) && BoardLogic.isPawn(moving)){
+			// replace pawn to King
+			board.setCell(target, BoardLogic.pawnToKing(moving));
+			Logs.debug("pawn on " + target.toString() + " has been replaced to king");
+		}
 
 		// remove (beat) all the pawns between source and target
 		removePawnsBetween(source, target);
@@ -43,7 +48,8 @@ public class GameSession {
 			// switch current player
 			currentPlayer = currentPlayer == BoardSymbols.WHITE_PAWN ? BoardSymbols.BLACK_PAWN : BoardSymbols.WHITE_PAWN;
 		}
-		// TODO kolejny ruch musi być tym samym pionkiem !!!
+
+		// TODO jeśli jest kolejny ruch, musi być wykonany tym samym pionkiem !!!
 	}
 
 	private void removePawnsBetween(Point source, Point target){
