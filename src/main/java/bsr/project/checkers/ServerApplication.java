@@ -29,7 +29,6 @@ public class ServerApplication {
 			new CommandLine(serverData).readContinuously();
 			
 			serverThread.join();
-			Logs.info("Server closed");
 			
 		} catch (Throwable e) {
 			Logs.error(e);
