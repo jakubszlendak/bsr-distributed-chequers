@@ -9,6 +9,16 @@ public class Board {
 	(0,1) (1,1) ... (BOARD_SIZE-1,1)
 	...   ...   ... ...
 	(0,BOARD_SIZE-1) (1,BOARD_SIZE-1) ... (BOARD_SIZE-1,BOARD_SIZE-1)
+
+	initial board:
+	OCOCOCOC
+	COCOCOCO
+	OCOCOCOC
+	OOOOOOOO
+	OOOOOOOO
+	BOBOBOBO
+	OBOBOBOB
+	BOBOBOBO
 	*/
 	private char[][] map;
 	
@@ -65,6 +75,10 @@ public class Board {
 	
 	public char getCell(Point p) {
 		return getCell(p.x, p.y);
+	}
+
+	public void setCell(Point p, char value){
+		map[p.x][p.y] = value;
 	}
 
 	public char[][] getMap(){

@@ -11,25 +11,46 @@ public class GameSession {
 	private ClientData player2; // NIGGA
 	
 	private char currentPlayer = BoardSymbols.WHITE_PAWN;
-	
 	private Board board;
+
+	private MoveValidator validator;
 	
 	public GameSession(ClientData player1, ClientData player2) {
 		this.player1 = player1;
 		this.player2 = player2;
 		board = new Board();
+		validator = new MoveValidator();
 	}
 	
 	
 	public void executeMove(ClientData player, Point source, Point target) throws InvalidMoveException {
 		char playerColor = player == player1 ? BoardSymbols.WHITE_PAWN : BoardSymbols.BLACK_PAWN;
-		MoveValidator.validateMove(playerColor, board, source, target);
-		// TODO execute move
+		boolean anotherMove = validator.validateMove(playerColor, board, source, target);
+		// execute move
+		char moving = board.getCell(source);
+		board.setCell(target, moving);
+		board.setCell(source, BoardSymbols.EMPTY); // replace by empty field
+
+		// TODO jeśli było bicie - usunięcie pobitego pionka (lub wielu) !!!
+
+		// update current player
+		if (!anotherMove){
+			// switch current player
+			currentPlayer = currentPlayer == BoardSymbols.WHITE_PAWN ? BoardSymbols.BLACK_PAWN : BoardSymbols.WHITE_PAWN;
+		}
 	}
 	
 	
-	private boolean isGameOver() {
+	public boolean isGameOver() {
 		return hasWhiteWon() || hasBlackWon();
+	}
+
+	public ClientData getWinner() {
+		if (hasWhiteWon())
+			return player1;
+		if (hasBlackWon())
+			return player2;
+		return null;
 	}
 	
 	private boolean hasWhiteWon() {

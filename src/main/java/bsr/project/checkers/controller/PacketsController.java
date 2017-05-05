@@ -21,6 +21,7 @@ import bsr.project.checkers.game.GameInvitation;
 import bsr.project.checkers.game.GameSession;
 import bsr.project.checkers.game.Point;
 import bsr.project.checkers.game.Board;
+import bsr.project.checkers.game.validator.InvalidMoveException;
 
 public class PacketsController implements IEventObserver {
 
@@ -279,7 +280,7 @@ public class PacketsController implements IEventObserver {
 		// send board to players
 		sendBoards(game);
 		// send your move message to White player
-		sendPacket(player1, builder.requestYourMove());
+		sendPacket(game.getCurrentPlayer(), builder.requestYourMove());
 	}
 
 	private void makeMove(ClientData player, ProtocolPacket packet) throws ProtocolErrorException {
@@ -293,26 +294,32 @@ public class PacketsController implements IEventObserver {
 		Point from = packet.getParameter(0, Point.class);
 		Point to = packet.getParameter(1, Point.class);
 
-		// TODO validate move
-
-		// TODO if not valid - send false response
+		// validate move
+		try{
+			// if valid - make move
+			game.executeMove(player, from, to);
+		}catch(InvalidMoveException e){
+			// if move is not valid - send response with false
 			sendPacket(player, builder.responseMakeMove(false));
-
-		// TODO if valid - make move
-		
+			Logs.warn("Invalid move: " + e.getMessage());
+			return;
+		}
+		// move has been executed successfully
 		sendPacket(player, builder.responseMakeMove(true));
-
-		// TODO send new board state
+		// update new board state
 		sendBoards(game);
 
-		// TODO check if there is game over
+		// check if game is over
+		ClientData winner = game.getWinner();
+		if (winner != null){
+			// send gameover message and exit
+			gameOver(game, winner, "Player " + winner + " beat all opponent's pawns");
+			return;
+		}
 
-		// TODO if yes - send gameover and exit
-
-		// TODO check whose move is next
-
-		// TODO send Your move to appropriate player
-
+		// check whose move is next, send Your move message
+		ClientData currentPlayer = game.getCurrentPlayer();
+		sendPacket(currentPlayer, builder.requestYourMove());
 	}
 
 	private void sendBoards(GameSession game){
