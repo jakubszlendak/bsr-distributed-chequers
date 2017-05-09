@@ -1,9 +1,15 @@
 package bsr.project.checkers.game.validator;
 
+import java.util.Optional;
+
 import bsr.project.checkers.game.Board;
 import bsr.project.checkers.game.BoardLogic;
 import bsr.project.checkers.game.Point;
 
+/**
+ * walidator do sprawdzania poprawności wykonywanych ruchów
+ * zasady gry: warcaby angielskie
+ */
 public class MoveValidator {
 	
 	/**
@@ -15,7 +21,7 @@ public class MoveValidator {
 	 * @return anotherMove if moving player has another move after current move
 	 * @throws InvalidMoveException if move is invalid
 	 */
-	public boolean validateMove(char playerColor, Board board, Point source, Point target) throws InvalidMoveException {
+	public Optional<Point> validateMove(char playerColor, Board board, Point source, Point target) throws InvalidMoveException {
 		// współrzędne w granicach planszy
 		if (BoardLogic.isOutOfBounds(source))
 			throw new InvalidMoveException("source field coordinates out of board bounds");
@@ -48,6 +54,8 @@ public class MoveValidator {
 		if (dx != dy)
 			throw new InvalidMoveException("only diagonal moves are allowed");
 		
+		// TODO jeśli ma możliwość bicia - nie można wykonać zwykłego ruchu
+		
 		if (BoardLogic.isPawn(sourceField)) {
 			// zwykły pionek
 			if (dx > 2)
@@ -57,7 +65,7 @@ public class MoveValidator {
 				if (BoardLogic.isMovingBackwards(sourceField, source, target))
 					throw new InvalidMoveException("pawn cannot move backwards");
 				// ruch poprawny - bez możliwości kolejnego ruchu
-				return false;
+				return Optional.empty();
 				
 			} else if (dx == 2) {
 				// bicie pionka przeciwnika
@@ -72,6 +80,7 @@ public class MoveValidator {
 				
 			}
 		} else if (BoardLogic.isKing(sourceField)) {
+			// "Król ma analogiczną możliwość wykonywania posunięć jak pion, z tym, że może poruszać się i bić także do tyłu"
 			// TODO damka
 			
 			// TODO jeśli pomiędzy były własne pionki
@@ -87,7 +96,8 @@ public class MoveValidator {
 		
 		// TODO lista legalnych ruchów, kopia mapy i symulacja
 		
-		return false;
+		return Optional.empty();
 	}
+	
 	
 }

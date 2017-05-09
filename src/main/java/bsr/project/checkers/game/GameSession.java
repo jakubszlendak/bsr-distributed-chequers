@@ -1,6 +1,7 @@
 package bsr.project.checkers.game;
 
 import java.util.List;
+import java.util.Optional;
 
 import bsr.project.checkers.client.ClientData;
 import bsr.project.checkers.game.validator.InvalidMoveException;
@@ -13,8 +14,9 @@ public class GameSession {
 	private ClientData player1; // WHITE
 	private ClientData player2; // NIGGA
 	
-	private char currentPlayer = BoardSymbols.WHITE_PAWN;
 	private Board board;
+	private char currentPlayer = BoardSymbols.WHITE_PAWN;
+	private Point nextMove = null;
 	
 	private MoveValidator validator;
 	
@@ -27,8 +29,9 @@ public class GameSession {
 	
 	
 	public void executeMove(ClientData player, Point source, Point target) throws InvalidMoveException {
+		
 		char playerColor = player == player1 ? BoardSymbols.WHITE_PAWN : BoardSymbols.BLACK_PAWN;
-		boolean anotherMove = validator.validateMove(playerColor, board, source, target);
+		Optional<Point> anotherMove = validator.validateMove(playerColor, board, source, target);
 		// move is valid - execute move
 		char moving = board.getCell(source);
 		board.setCell(target, moving);
@@ -38,18 +41,24 @@ public class GameSession {
 		if (BoardLogic.isOnBoardEnd(playerColor, target) && BoardLogic.isPawn(moving)) {
 			// replace pawn to King
 			board.setCell(target, BoardLogic.pawnToKing(moving));
-			Logs.debug("pawn on " + target.toString() + " has been replaced to king");
+			Logs.debug("pawn on " + target.toString() + " has been transformed to king");
+			// "Promocja piona do króla powoduje zakończenie posunięcia"
+			anotherMove = Optional.empty();
 		}
+		
+		nextMove = anotherMove.orElse(null);
 		
 		// remove (beat) all the pawns between source and target
 		removePawnsBetween(source, target);
-		// update current player
-		if (!anotherMove) {
+		// if current player does not make next move
+		if (!anotherMove.isPresent()) {
 			// switch current player
 			currentPlayer = currentPlayer == BoardSymbols.WHITE_PAWN ? BoardSymbols.BLACK_PAWN : BoardSymbols.WHITE_PAWN;
 		}
 		
 		// TODO jeśli jest kolejny ruch, musi być wykonany tym samym pionkiem !!!
+		
+		// TODO jeśli nie ma możliwości wykonania ruchu - wygrana drugiego gracza
 	}
 	
 	private void removePawnsBetween(Point source, Point target) {

@@ -45,15 +45,11 @@ public class PacketsParser {
 				String login = getPart(parts, 1);
 				String passwd = getPart(parts, 2);
 				return new ProtocolPacket(packetType, login, passwd);
-				// TODO próba zalogowania, weryfikacja hasła z bazą użytkowników, zmiana stanu na LOGGED_IN
-				// TODO odesłanie odpowiedzi : LGN 1 w przypadku powodzenia
 			}
 			case CREATE_ACCOUNT: { // 2. Rejestracja - Utworzenie konta w systemie
 				String login = getPart(parts, 1);
 				String passwd = getPart(parts, 2);
 				return new ProtocolPacket(packetType, login, passwd);
-				// TODO jeśli nie istnieje użytkownik, dodanie do bazy
-				// TODO odesłanie odpowiedzi : CRA 1 w przypadku powodzenia
 			}
 			case LIST_PLAYERS: { // 3. Lista - Pobranie listy graczy
 				return new ProtocolPacket(packetType);
