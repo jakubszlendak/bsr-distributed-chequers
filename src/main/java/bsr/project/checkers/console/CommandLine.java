@@ -1,16 +1,16 @@
 package bsr.project.checkers.console;
 
-import java.util.Scanner;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 import bsr.project.checkers.client.ClientData;
 import bsr.project.checkers.dispatcher.EventDispatcher;
 import bsr.project.checkers.events.ServerCloseEvent;
+import bsr.project.checkers.game.Board;
+import bsr.project.checkers.game.GameSession;
 import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.server.ServerData;
-import bsr.project.checkers.game.GameSession;
-import bsr.project.checkers.game.Board;
 
 public class CommandLine {
 	
@@ -48,7 +48,7 @@ public class CommandLine {
 			serverClose();
 		} else if (cmd.equals("clients")) {
 			int number = 1;
-			Logs.info("Connected clients ["+serverData.getClients().size()+"]:");
+			Logs.info("Connected clients [" + serverData.getClients().size() + "]:");
 			for (ClientData clientData : serverData.getClients()) {
 				StringBuilder sb = new StringBuilder();
 				sb.append(Integer.toString(number));
@@ -63,7 +63,7 @@ public class CommandLine {
 			}
 		} else if (cmd.equals("games")) {
 			int number = 1;
-			Logs.info("Active game sessions ["+serverData.getGames().size()+"]:");
+			Logs.info("Active game sessions [" + serverData.getGames().size() + "]:");
 			for (GameSession game : serverData.getGames()) {
 				StringBuilder sb = new StringBuilder();
 				sb.append(Integer.toString(number));
@@ -75,7 +75,7 @@ public class CommandLine {
 				sb.append(game.getCurrentPlayer().getLogin());
 				sb.append(", current board:");
 				Logs.info(sb.toString());
-
+				
 				char[][] map = game.getBoard().getMap();
 				for (int y = 0; y < Board.BOARD_SIZE; y++) {
 					StringBuilder sb2 = new StringBuilder();
@@ -84,7 +84,7 @@ public class CommandLine {
 					}
 					Logs.info(sb2.toString());
 				}
-
+				
 				number++;
 			}
 		} else if (cmd.equals("kick all")) {

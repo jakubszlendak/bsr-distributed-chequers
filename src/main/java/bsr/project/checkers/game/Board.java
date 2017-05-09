@@ -60,7 +60,8 @@ public class Board {
 		for (int x = 0; x < BOARD_SIZE; x++) {
 			for (int y = 0; y < BOARD_SIZE; y++) {
 				for (char symbol : symbols) {
-					if (map[x][y] == symbol) count++;
+					if (map[x][y] == symbol)
+						count++;
 				}
 			}
 		}
@@ -76,12 +77,12 @@ public class Board {
 	public char getCell(Point p) {
 		return getCell(p.x, p.y);
 	}
-
-	public void setCell(Point p, char value){
+	
+	public void setCell(Point p, char value) {
 		map[p.x][p.y] = value;
 	}
-
-	public char[][] getMap(){
+	
+	public char[][] getMap() {
 		return map;
 	}
 	

@@ -79,7 +79,8 @@ public class EventDispatcher {
 	}
 	
 	private void dispatchEvents() {
-		if (dispatching) return;
+		if (dispatching)
+			return;
 		dispatching = true;
 		
 		synchronized (eventsQueue) {

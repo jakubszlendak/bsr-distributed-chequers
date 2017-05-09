@@ -2,7 +2,6 @@ package bsr.project.checkers.protocol;
 
 import java.text.ParseException;
 
-import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.game.Point;
 
 /**
@@ -17,12 +16,12 @@ public class PacketsParser {
 			throw new ParseException("not enough parameters", 0);
 		return parts[index];
 	}
-
+	
 	private int getPartInt(String[] parts, int index) throws ParseException {
 		String numberStr = getPart(parts, index);
-		try{
+		try {
 			return Integer.parseInt(numberStr);
-		}catch(NumberFormatException e){
+		} catch (NumberFormatException e) {
 			throw new ParseException("invalid number format: " + numberStr, 0);
 		}
 	}
@@ -33,9 +32,9 @@ public class PacketsParser {
 		
 		if (parts.length == 0)
 			throw new ParseException("Empty packet", 0);
-			
+		
 		String code = getPart(parts, 0);
-
+		
 		PacketType packetType = PacketType.parseByCode(code);
 		if (packetType == null)
 			throw new ParseException("Unknown packet code: " + code, 0);

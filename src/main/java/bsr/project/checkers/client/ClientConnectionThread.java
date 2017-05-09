@@ -2,14 +2,13 @@ package bsr.project.checkers.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 
-import bsr.project.checkers.client.ClientData;
 import bsr.project.checkers.dispatcher.EventDispatcher;
 import bsr.project.checkers.events.PacketReceivedEvent;
 import bsr.project.checkers.logger.Logs;
@@ -104,8 +103,10 @@ public class ClientConnectionThread extends Thread {
 	}
 	
 	public synchronized void sendLine(String line) {
-		if (!active) throw new IllegalStateException("Client connection is no longer active");
-		if (out == null) throw new IllegalStateException("No output stream");
+		if (!active)
+			throw new IllegalStateException("Client connection is no longer active");
+		if (out == null)
+			throw new IllegalStateException("No output stream");
 		out.println(line);
 		out.flush();
 	}

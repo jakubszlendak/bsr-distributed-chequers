@@ -85,7 +85,9 @@ public class UsersDatabase {
 	
 	public boolean passwordValid(String login, String passwd) {
 		String hashed = hashPassword(passwd);
-		return users.stream().anyMatch(user -> user.getLogin().equals(login) && user.getPwdCksum().equals(hashed));
+		return users.stream()
+				.anyMatch(user -> user.getLogin().equals(login) && user.getPwdCksum()
+						.equals(hashed));
 	}
 	
 	private String hashPassword(String pass) {

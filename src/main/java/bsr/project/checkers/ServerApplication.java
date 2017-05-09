@@ -1,10 +1,10 @@
 package bsr.project.checkers;
 
 import bsr.project.checkers.console.CommandLine;
-import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.controller.PacketsController;
-import bsr.project.checkers.server.ServerThread;
+import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.server.ServerData;
+import bsr.project.checkers.server.ServerThread;
 
 public class ServerApplication {
 	

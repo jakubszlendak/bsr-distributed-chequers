@@ -5,13 +5,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
+import bsr.project.checkers.client.ClientConnectionThread;
 import bsr.project.checkers.dispatcher.AbstractEvent;
 import bsr.project.checkers.dispatcher.EventDispatcher;
 import bsr.project.checkers.dispatcher.IEventObserver;
 import bsr.project.checkers.events.ServerCloseEvent;
 import bsr.project.checkers.logger.Logs;
-import bsr.project.checkers.server.ServerData;
-import bsr.project.checkers.client.ClientConnectionThread;
 
 public class ServerThread extends Thread implements IEventObserver {
 	

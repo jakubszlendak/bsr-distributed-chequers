@@ -6,7 +6,7 @@ public class Logs {
 	private static final LogLevel CONSOLE_LEVEL = LogLevel.ALL;
 	private static final LogLevel SHOW_TRACE_DETAILS_LEVEL = LogLevel.TRACE;
 	private static final boolean SHOW_EXCEPTIONS_TRACE = true;
-
+	
 	private static final Object PRINT_LOCK = new Object();
 	
 	// console text formatting characters
@@ -30,7 +30,7 @@ public class Logs {
 	}
 	
 	public static void error(Throwable ex) {
-		synchronized(PRINT_LOCK){
+		synchronized (PRINT_LOCK) {
 			if (SHOW_EXCEPTIONS_TRACE) {
 				System.out.print(C_BOLD + C_RED + "[ERROR] " + C_RESET);
 				ex.printStackTrace();
@@ -84,7 +84,7 @@ public class Logs {
 		if (level.lowerOrEqual(CONSOLE_LEVEL)) {
 			
 			String consoleMessage;
-
+			
 			if (level.higherOrEqual(SHOW_TRACE_DETAILS_LEVEL)) {
 				final int stackTraceIndex = 3;
 				
@@ -99,18 +99,19 @@ public class Logs {
 				consoleMessage = logPrefix + message;
 			}
 			
-			synchronized(PRINT_LOCK){
+			synchronized (PRINT_LOCK) {
 				System.out.println(consoleMessage);
 			}
 		}
 	}
 	
 	public static void printStackTrace() {
-		synchronized(PRINT_LOCK){
+		synchronized (PRINT_LOCK) {
 			int i = 0;
 			for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
 				i++;
-				if (i <= 3) continue;
+				if (i <= 3)
+					continue;
 				String methodName = ste.getMethodName();
 				String fileName = ste.getFileName();
 				int lineNumber = ste.getLineNumber();

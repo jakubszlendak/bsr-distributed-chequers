@@ -33,24 +33,24 @@ public class ClientData {
 	public String getHostname() {
 		return clientConnection.getHostname();
 	}
-
+	
 	/**
 	 * @return czy gracz jest gotowy na nową grę
 	 */
 	public boolean isReadyForNewGame() {
 		return isConnected() && state == ClientState.LOGGED_IN;
 	}
-
+	
 	public String getLogin() {
 		return login;
 	}
-
-	public void setLogin(String login){
+	
+	public void setLogin(String login) {
 		this.login = login;
 	}
-
+	
 	@Override
-	public String toString(){
+	public String toString() {
 		if (login != null)
 			return login;
 		return getHostname();

@@ -2,7 +2,6 @@ package bsr.project.checkers.events;
 
 import bsr.project.checkers.client.ClientData;
 import bsr.project.checkers.dispatcher.AbstractEvent;
-import bsr.project.checkers.server.ServerData;
 
 public class PacketReceivedEvent extends AbstractEvent {
 	
