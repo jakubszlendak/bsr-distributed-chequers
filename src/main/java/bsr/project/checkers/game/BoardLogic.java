@@ -7,8 +7,8 @@ import bsr.project.checkers.protocol.BoardSymbols;
 
 public class BoardLogic {
 	
-	public static boolean isOutOfBounds(Point p) {
-		return p.x < 0 || p.y < 0 || p.x >= Board.BOARD_SIZE || p.y >= Board.BOARD_SIZE;
+	public static boolean isOnBoard(Point p) {
+		return p.x >= 0 && p.y >= 0 && p.x < Board.BOARD_SIZE && p.y < Board.BOARD_SIZE;
 	}
 	
 	public static boolean isWhite(char field) {
@@ -100,5 +100,50 @@ public class BoardLogic {
 		}
 		return false;
 	}
+
+	/**
+	 * @return list of potential diagonal move targets based only on posistion on the board
+	 */
+	public static List<Point> potentialTargets(Point source, char sourceField){
+		List<Point> targets = new ArrayList<>();
+		// move by 1 or 2 field diagonal in 4 directions
+		for(int dx = -2; dx <= 2; dx++){
+			addPotentialTarget(source, targets, dx, dx);
+			addPotentialTarget(source, targets, dx, -dx);
+		}
+		return targets;
+	}
+
+	private static void addPotentialTarget(Point source, List<Point> targets, int xOffset, int yOffset) {
+		if(xOffset == 0 && yOffset == 0)
+			return;
+		Point target = source.move(xOffset, yOffset);
+		if (BoardLogic.isOnBoard(target)){
+			if (!targets.contains(target))
+				targets.add(target);
+		}
+	}
 	
+	public static int absDX(Point source, Point target){
+		return abs(source.x - target.x);
+	}
+
+	public static int absDY(Point source, Point target){
+		return abs(source.y - target.y);
+	}
+
+	public static List<Point> listAllPlayerPawns(char playerColor, Board board){
+		List<Point> playerPawns = new ArrayList<>();
+
+		for (int x = 0; x < Board.BOARD_SIZE; x++) {
+			for (int y = 0; y < Board.BOARD_SIZE; y++) {
+				char field = board.getCell(x, y);
+				if (isSameColor(playerColor, field)){
+					playerPawns.add(new Point(x, y));
+				}
+			}
+		}
+
+		return playerPawns;
+	}
 }

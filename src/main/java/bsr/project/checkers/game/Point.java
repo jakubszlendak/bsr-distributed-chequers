@@ -10,11 +10,18 @@ public class Point {
 		this.y = y;
 	}
 	
-	public boolean equals(Point p2) {
-		return this.x == p2.x && this.y == p2.y;
+	@Override
+	public boolean equals(Object p2) {
+		if (!(p2 instanceof Point))
+			return false;
+		return this.x == ((Point) p2).x && this.y == ((Point) p2).y;
 	}
 	
 	public String toString() {
 		return "(" + x + "," + y + ")";
+	}
+
+	public Point move(int xOffset, int yOffset){
+		return new Point(x + xOffset, y + yOffset);
 	}
 }

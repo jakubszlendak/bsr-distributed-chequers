@@ -1,6 +1,8 @@
 package bsr.project.checkers.game.validator;
 
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 import bsr.project.checkers.game.Board;
 import bsr.project.checkers.game.BoardLogic;
@@ -23,9 +25,9 @@ public class MoveValidator {
 	 */
 	public Optional<Point> validateMove(char playerColor, Board board, Point source, Point target) throws InvalidMoveException {
 		// współrzędne w granicach planszy
-		if (BoardLogic.isOutOfBounds(source))
+		if (!BoardLogic.isOnBoard(source))
 			throw new InvalidMoveException("source field coordinates out of board bounds");
-		if (BoardLogic.isOutOfBounds(target))
+		if (!BoardLogic.isOnBoard(target))
 			throw new InvalidMoveException("target field coordinates out of board bounds");
 		
 		char sourceField = board.getCell(source);
@@ -49,45 +51,42 @@ public class MoveValidator {
 			throw new InvalidMoveException("target field is the same as source");
 		
 		// ruch tylko na ukos
-		int dx = BoardLogic.abs(source.x - target.x);
-		int dy = BoardLogic.abs(source.y - target.y);
+		int dx = BoardLogic.absDX(source, target);
+		int dy = BoardLogic.absDY(source, target);
 		if (dx != dy)
 			throw new InvalidMoveException("only diagonal moves are allowed");
+
+		// ruch o 1 lub 2 pola
+		if (dx > 2)
+			throw new InvalidMoveException("cannot move by more than 2 fields");
+
+		// TODO czy zwykły pionek może bić do tyłu ?
+
+		// zwykły pionek, podczas zwykłego ruchu nie może się cofać
+		if (BoardLogic.isPawn(sourceField) && dx == 1 && BoardLogic.isMovingBackwards(sourceField, source, target))
+			throw new InvalidMoveException("pawn cannot move backwards");
 		
 		// TODO jeśli ma możliwość bicia - nie można wykonać zwykłego ruchu
 		
-		if (BoardLogic.isPawn(sourceField)) {
-			// zwykły pionek
-			if (dx > 2)
-				throw new InvalidMoveException("pawn cannot move by more than 2 fields");
-			if (dx == 1) { // zwykły ruch do przodu
-				// pionek nie może się cofać
-				if (BoardLogic.isMovingBackwards(sourceField, source, target))
-					throw new InvalidMoveException("pawn cannot move backwards");
-				// ruch poprawny - bez możliwości kolejnego ruchu
-				return Optional.empty();
-				
-			} else if (dx == 2) {
-				// bicie pionka przeciwnika
-				Point between = BoardLogic.pointBetween(source, target);
-				char betweenField = board.getCell(between);
-				// pionek pomiędzy musi być przeciwnego koloru
-				if (!BoardLogic.isOppositeColor(sourceField, betweenField))
-					throw new InvalidMoveException("pawn can only jump over opponent's pawns");
-				// ruch poprawny
-				
-				// TODO sprawdzenie, czy można bić w kolejnym ruchu
-				
-			}
-		} else if (BoardLogic.isKing(sourceField)) {
-			// "Król ma analogiczną możliwość wykonywania posunięć jak pion, z tym, że może poruszać się i bić także do tyłu"
-			// TODO damka
+		// "Król ma analogiczną możliwość wykonywania posunięć jak pion, z tym, że może poruszać się i bić także do tyłu"
+
+		if (dx == 1) { // zwykły ruch o jedno pole
+			// pionek nie może się cofać
+			if (BoardLogic.isMovingBackwards(sourceField, source, target))
+				throw new InvalidMoveException("pawn cannot move backwards");
+			// ruch poprawny - bez możliwości kolejnego ruchu
 			
-			// TODO jeśli pomiędzy były własne pionki
+		} else if (dx == 2) {
+			// bicie pionka przeciwnika
+			Point between = BoardLogic.pointBetween(source, target);
+			char betweenField = board.getCell(between);
+			// pionek pomiędzy musi być przeciwnego koloru
+			if (!BoardLogic.isOppositeColor(sourceField, betweenField))
+				throw new InvalidMoveException("pawn can only jump over opponent's pawns");
 			
-			// TODO jeśli pomiędzy były pionki przeciwnika - było bicie
+			// TODO sprawdzenie, czy można bić w kolejnym ruchu
 			
-			
+			// ruch poprawny
 		}
 		
 		// TODO czy było bicie
@@ -98,6 +97,46 @@ public class MoveValidator {
 		
 		return Optional.empty();
 	}
+
+	public boolean isMoveValid(char playerColor, Board board, Point source, Point target) {
+		try{
+			validateMove(playerColor, board, source, target);
+			return true;
+		}catch (InvalidMoveException e){
+			return false;
+		}
+	}
 	
+	public List<PossibleMove> generatePossibleMoves(char playerColor, Board board, Point source){
+		List<PossibleMove> possibleMoves = new ArrayList<>();
+		char sourceField = board.getCell(source);
+
+		// check if potential targets are valid
+		List<Point> potentialTargets = BoardLogic.potentialTargets(source, sourceField);
+		for(Point potentialTarget : potentialTargets){
+			if (isMoveValid(playerColor, board, source, potentialTarget)){
+				possibleMoves.add(new PossibleMove(source, potentialTarget));
+			}
+		}
+
+		return possibleMoves;
+	}
+	
+	public List<PossibleMove> generateAllPossibleMoves(char playerColor, Board board){
+		List<PossibleMove> allPossibleMoves = new ArrayList<>();
+
+		List<Point> playerPawns = BoardLogic.listAllPlayerPawns(playerColor, board);
+		for (Point playerPawn : playerPawns){
+			List<PossibleMove> possibleMoves = generatePossibleMoves(playerColor, board, playerPawn);
+			allPossibleMoves.addAll(possibleMoves);
+		}
+
+		return allPossibleMoves;
+	}
+
+	public boolean isBeatingPossible(List<PossibleMove> possibleMoves){
+		return possibleMoves.stream()
+				.anyMatch(move -> move.isBeating());
+	}
 	
 }
