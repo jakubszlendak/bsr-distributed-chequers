@@ -23,7 +23,7 @@ public class MoveValidator {
 	 * @return anotherMove if moving player has another move after current move
 	 * @throws InvalidMoveException if move is invalid
 	 */
-	public Optional<Point> validateMove(char playerColor, Board board, Point source, Point target) throws InvalidMoveException {
+	public Optional<Point> validateMove(char playerColor, Board board, Point source, Point target, Optional<Point> nextMove) throws InvalidMoveException {
 		// współrzędne w granicach planszy
 		if (!BoardLogic.isOnBoard(source))
 			throw new InvalidMoveException("source field coordinates out of board bounds");
@@ -56,7 +56,7 @@ public class MoveValidator {
 		if (dx != dy)
 			throw new InvalidMoveException("only diagonal moves are allowed");
 
-		// ruch o 1 lub 2 pola
+		// ruch tylko o 1 lub 2 pola
 		if (dx > 2)
 			throw new InvalidMoveException("cannot move by more than 2 fields");
 
@@ -98,23 +98,23 @@ public class MoveValidator {
 		return Optional.empty();
 	}
 
-	public boolean isMoveValid(char playerColor, Board board, Point source, Point target) {
+	public boolean isMoveValid(char playerColor, Board board, Point source, Point target, Optional<Point> nextMove) {
 		try{
-			validateMove(playerColor, board, source, target);
+			validateMove(playerColor, board, source, target, nextMove);
 			return true;
 		}catch (InvalidMoveException e){
 			return false;
 		}
 	}
 	
-	public List<PossibleMove> generatePossibleMoves(char playerColor, Board board, Point source){
+	public List<PossibleMove> generatePossibleMoves(char playerColor, Board board, Point source, Optional<Point> nextMove){
 		List<PossibleMove> possibleMoves = new ArrayList<>();
 		char sourceField = board.getCell(source);
 
 		// check if potential targets are valid
 		List<Point> potentialTargets = BoardLogic.potentialTargets(source, sourceField);
 		for(Point potentialTarget : potentialTargets){
-			if (isMoveValid(playerColor, board, source, potentialTarget)){
+			if (isMoveValid(playerColor, board, source, potentialTarget, nextMove)){
 				possibleMoves.add(new PossibleMove(source, potentialTarget));
 			}
 		}
@@ -122,12 +122,12 @@ public class MoveValidator {
 		return possibleMoves;
 	}
 	
-	public List<PossibleMove> generateAllPossibleMoves(char playerColor, Board board){
+	public List<PossibleMove> generateAllPossibleMoves(char playerColor, Board board, Optional<Point> nextMove){
 		List<PossibleMove> allPossibleMoves = new ArrayList<>();
 
 		List<Point> playerPawns = BoardLogic.listAllPlayerPawns(playerColor, board);
 		for (Point playerPawn : playerPawns){
-			List<PossibleMove> possibleMoves = generatePossibleMoves(playerColor, board, playerPawn);
+			List<PossibleMove> possibleMoves = generatePossibleMoves(playerColor, board, playerPawn, nextMove);
 			allPossibleMoves.addAll(possibleMoves);
 		}
 
@@ -139,4 +139,11 @@ public class MoveValidator {
 				.anyMatch(move -> move.isBeating());
 	}
 	
+	public boolean isBeatingPossible(char playerColor, Board board, Optional<Point> nextMove){
+		return isBeatingPossible(generateAllPossibleMoves(playerColor, board, nextMove));
+	}
+	
+	public boolean isBeatingPossible(char playerColor, Board board, Point source, Optional<Point> nextMove){
+		return isBeatingPossible(generatePossibleMoves(playerColor, board, source, nextMove));
+	}
 }

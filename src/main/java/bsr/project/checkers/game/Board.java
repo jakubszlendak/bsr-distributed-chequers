@@ -1,6 +1,8 @@
 package bsr.project.checkers.game;
 
 import bsr.project.checkers.protocol.BoardSymbols;
+import bsr.project.checkers.logger.Logs;
+import java.util.List;
 
 public class Board {
 	/*
@@ -27,6 +29,16 @@ public class Board {
 	
 	public Board() {
 		initBoard();
+	}
+
+	public Board(Board sourceBoard){
+		map = new char[BOARD_SIZE][BOARD_SIZE];
+		// copy board
+		for (int x = 0; x < BOARD_SIZE; x++) {
+			for (int y = 0; y < BOARD_SIZE; y++) {
+				map[x][y] = sourceBoard.map[x][y];
+			}
+		}
 	}
 	
 	private void initBoard() {
@@ -94,5 +106,29 @@ public class Board {
 			}
 		}
 		return sb.toString();
+	}
+
+	public void executeMove(char playerColor, Point source, Point target, boolean verbose){
+		// move source to target
+		char moving = getCell(source);
+		setCell(target, moving);
+		setCell(source, BoardSymbols.EMPTY); // replace by empty field
+		// remove (beat) all the pawns between source and target
+		List<Point> points = BoardLogic.pointsBetween(source, target);
+		for (Point p : points) {
+			char cell = getCell(p);
+			if (cell != BoardSymbols.EMPTY) {
+				setCell(p, BoardSymbols.EMPTY);
+				if (verbose)
+					Logs.debug("Pawn " + cell + " on field " + p.toString() + " has been beaten");
+			}
+		}
+		// if pawn reached end of board
+		if (BoardLogic.isOnBoardEnd(playerColor, target) && BoardLogic.isPawn(moving)) {
+			// transform pawn to King
+			setCell(target, BoardLogic.pawnToKing(moving));
+			if (verbose)
+				Logs.debug("pawn on " + target.toString() + " field has been transformed to king");
+		}
 	}
 }

@@ -16,7 +16,7 @@ public class GameSession {
 	
 	private Board board;
 	private char currentPlayer = BoardSymbols.WHITE_PAWN;
-	private Point nextMove = null;
+	private Optional<Point> nextMove = Optional.empty();
 	
 	private MoveValidator validator;
 	
@@ -31,45 +31,22 @@ public class GameSession {
 	public void executeMove(ClientData player, Point source, Point target) throws InvalidMoveException {
 		
 		char playerColor = player == player1 ? BoardSymbols.WHITE_PAWN : BoardSymbols.BLACK_PAWN;
-		Optional<Point> anotherMove = validator.validateMove(playerColor, board, source, target);
+		nextMove = validator.validateMove(playerColor, board, source, target, nextMove);
+
 		// move is valid - execute move
-		char moving = board.getCell(source);
-		board.setCell(target, moving);
-		board.setCell(source, BoardSymbols.EMPTY); // replace by empty field
-		
-		// pawn reached end of board
-		if (BoardLogic.isOnBoardEnd(playerColor, target) && BoardLogic.isPawn(moving)) {
-			// replace pawn to King
-			board.setCell(target, BoardLogic.pawnToKing(moving));
-			Logs.debug("pawn on " + target.toString() + " has been transformed to king");
-			// "Promocja piona do króla powoduje zakończenie posunięcia"
-			anotherMove = Optional.empty();
-		}
-		
-		nextMove = anotherMove.orElse(null);
-		
-		// remove (beat) all the pawns between source and target
-		removePawnsBetween(source, target);
+		board.executeMove(playerColor, source, target, true);
+
 		// if current player does not make next move
-		if (!anotherMove.isPresent()) {
+		if (!nextMove.isPresent()) {
 			// switch current player
 			currentPlayer = currentPlayer == BoardSymbols.WHITE_PAWN ? BoardSymbols.BLACK_PAWN : BoardSymbols.WHITE_PAWN;
 		}
 		
+		// TODO "Promocja piona do króla powoduje zakończenie posunięcia"
+
 		// TODO jeśli jest kolejny ruch, musi być wykonany tym samym pionkiem !!!
 		
 		// TODO jeśli nie ma możliwości wykonania ruchu - wygrana drugiego gracza
-	}
-	
-	private void removePawnsBetween(Point source, Point target) {
-		List<Point> points = BoardLogic.pointsBetween(source, target);
-		for (Point p : points) {
-			char cell = board.getCell(p);
-			if (cell != BoardSymbols.EMPTY) {
-				board.setCell(p, BoardSymbols.EMPTY);
-				Logs.debug("Pawn " + cell + " on field " + p.toString() + " has been beaten");
-			}
-		}
 	}
 	
 	
