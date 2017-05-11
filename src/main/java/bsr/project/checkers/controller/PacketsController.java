@@ -335,14 +335,20 @@ public class PacketsController implements IEventObserver {
 		
 		if (DEBUG_BOARD) {
 			Logs.debug("Current board:");
+			Logs.debug(" |01234567|");
+			Logs.debug("-+--------+");
 			char[][] map = game.getBoard().getMap();
 			for (int y = 0; y < Board.BOARD_SIZE; y++) {
 				StringBuilder sb = new StringBuilder();
+				sb.append(y);
+				sb.append("|");
 				for (int x = 0; x < Board.BOARD_SIZE; x++) {
-					sb.append(map[x][y]);
+					sb.append(map[x][y] == BoardSymbols.EMPTY ? " " : map[x][y]);
 				}
+				sb.append("|");
 				Logs.debug(sb.toString());
 			}
+			Logs.debug("-+--------+");
 		}
 	}
 	
