@@ -1,13 +1,10 @@
 package bsr.project.checkers.game;
 
-import java.util.List;
 import java.util.Optional;
 
 import bsr.project.checkers.client.ClientData;
 import bsr.project.checkers.game.validator.InvalidMoveException;
-import bsr.project.checkers.game.validator.NoNextMoveAvailable;
 import bsr.project.checkers.game.validator.MoveValidator;
-import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.protocol.BoardSymbols;
 
 public class GameSession {
@@ -32,7 +29,7 @@ public class GameSession {
 	public void executeMove(ClientData player, Point source, Point target) throws InvalidMoveException {
 		
 		char playerColor = player == player1 ? BoardSymbols.WHITE_PAWN : BoardSymbols.BLACK_PAWN;
-		nextMove = validator.advancedValidateMove(playerColor, board, source, target, nextMove);
+		nextMove = validator.advancedMoveValidation(playerColor, board, source, target, nextMove);
 
 		// move is valid - execute move
 		BoardLogic.executeMove(board, playerColor, source, target, true);
@@ -41,17 +38,12 @@ public class GameSession {
 		if (!nextMove.isPresent()) {
 			// switch current player
 			currentPlayer = currentPlayer == BoardSymbols.WHITE_PAWN ? BoardSymbols.BLACK_PAWN : BoardSymbols.WHITE_PAWN;
-			// TODO jeśli nie ma możliwości wykonania ruchu - wygrana drugiego gracza - rzucić wyjątek
-			if (!validator.isAnyMovePossible(currentPlayer, board)){
-				throw new NoNextMoveAvailable();
-			}
 		}
 		
 	}
 	
-	
-	public boolean isGameOver() {
-		return hasWhiteWon() || hasBlackWon();
+	public boolean isAnyMovePossible() {
+		return validator.isAnyMovePossible(currentPlayer, board);
 	}
 	
 	public ClientData getWinner() {

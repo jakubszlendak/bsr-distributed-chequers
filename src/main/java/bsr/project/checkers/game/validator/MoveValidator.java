@@ -1,8 +1,9 @@
 package bsr.project.checkers.game.validator;
 
-import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import bsr.project.checkers.game.Board;
 import bsr.project.checkers.game.BoardLogic;
@@ -10,20 +11,50 @@ import bsr.project.checkers.game.Point;
 
 /**
  * walidator do sprawdzania poprawności wykonywanych ruchów
- * zasady gry: warcaby angielskie
+ * zasady gry: <a href="https://pl.wikipedia.org/wiki/Warcaby_angielskie">warcaby angielskie</a>
  */
 public class MoveValidator {
 	
+	
 	/**
-	 * check if move is valid
+	 * advanced move validation with checking if possible beating move is being made
 	 * @param playerColor moving player color (@see BoardSymbols.WHITE_PAWN, @see BoardSymbols.BLACK_PAWN)
 	 * @param board       current board (before move)
 	 * @param source      source pawn coordinates
 	 * @param target      target field coordinates
-	 * @return anotherMove if moving player has another move after current move
+	 * @param nextMove    coordinates of piece to make next move (optional)
+	 * @return anotherMove coordinates of piece that is obligatory to make next move (optional)
+	 * @throws InvalidMoveException
+	 */
+	public Optional<Point> advancedMoveValidation(char playerColor, Board board, Point source, Point target, Optional<Point> nextMove) throws InvalidMoveException {
+		
+		Optional<Point> anotherMove = basicMoveValidation(playerColor, board, source, target, nextMove);
+		
+		// sprawdzanie, czy jest możliwe bicie przeciwnika jakimkolwiek pionkiem
+		List<PossibleMove> allPossibleMoves = generateAllPossibleMoves(playerColor, board, Optional.empty());
+		boolean beatingPossible = isBeatingPossible(allPossibleMoves);
+		if (beatingPossible) { //jeśli jest możliwe bicie
+			List<PossibleMove> beatingMoves = filterBeatingMoves(allPossibleMoves);
+			// czy ruch wykonywany jest pionkiem, który może wykonać bicie
+			if (!(beatingMoves.contains(new PossibleMove(source, target)))) {
+				throw new InvalidMoveException("Beating move is possible.");
+			}
+		}
+		
+		return anotherMove;
+	}
+	
+	/**
+	 * basic move validation without checking pawn beating chains
+	 * @param playerColor moving player color (@see BoardSymbols.WHITE_PAWN, @see BoardSymbols.BLACK_PAWN)
+	 * @param board       current board (before move)
+	 * @param source      source pawn coordinates
+	 * @param target      target field coordinates
+	 * @param nextMove    coordinates of piece to make next move (optional)
+	 * @return anotherMove coordinates of piece that is obligatory to make next move (optional)
 	 * @throws InvalidMoveException if move is invalid
 	 */
-	public Optional<Point> validateMove(char playerColor, Board board, Point source, Point target, Optional<Point> nextMove) throws InvalidMoveException {
+	private Optional<Point> basicMoveValidation(char playerColor, Board board, Point source, Point target, Optional<Point> nextMove) throws InvalidMoveException {
 		// współrzędne w granicach planszy
 		if (!BoardLogic.isOnBoard(source))
 			throw new InvalidMoveException("source field coordinates out of board bounds");
@@ -55,24 +86,23 @@ public class MoveValidator {
 		int dy = BoardLogic.absDY(source, target);
 		if (dx != dy)
 			throw new InvalidMoveException("only diagonal moves are allowed");
-
+		
 		// ruch tylko o 1 lub 2 pola
 		if (dx > 2)
 			throw new InvalidMoveException("cannot move by more than 2 fields");
-
+		
 		// czy wybrano pionka, którym trzeba wykonać następny ruch
-		if (nextMove.isPresent()){
-			if (!nextMove.get().equals(source)){
+		if (nextMove.isPresent()) {
+			if (!nextMove.get().equals(source)) {
 				throw new InvalidMoveException("next move must be made by pawn: " + source);
 			}
 		}
-
-		// TODO czy zwykły pionek może bić do tyłu ?
+		
 		// "Król ma analogiczną możliwość wykonywania posunięć jak pion, z tym, że może poruszać się i bić także do tyłu"
 		// zwykły pionek, podczas zwykłego ruchu nie może się cofać
 		if (BoardLogic.isPawn(sourceField) && dx == 1 && BoardLogic.isMovingBackwards(sourceField, source, target))
 			throw new InvalidMoveException("pawn cannot move backwards");
-
+		
 		if (dx == 1) { // zwykły ruch o jedno pole
 			// ruch potencjalnie poprawny
 			
@@ -85,7 +115,7 @@ public class MoveValidator {
 				throw new InvalidMoveException("pawn can only jump over opponent's pawns");
 			// ruch potencjalnie poprawny
 		}
-
+		
 		Optional<Point> anotherMove = Optional.empty();
 		// wyjątek: "Promocja piona do króla powoduje zakończenie posunięcia"
 		if (BoardLogic.isOnBoardEnd(playerColor, target) && BoardLogic.isPawn(sourceField)) {
@@ -98,7 +128,7 @@ public class MoveValidator {
 			// symulacja ustawienia planszy w kolejnym ruchu
 			BoardLogic.executeMove(nextBoard, playerColor, source, target, false);
 			// sprawdzenie, czy można wykonać bicie w kolejnym ruchu tym samym pionkiem
-			if(isBeatingPossible(playerColor, nextBoard, target, Optional.of(target))){
+			if (isBeatingPossible(playerColor, nextBoard, target, Optional.of(target))) {
 				// jeśli tak, to następny ruch wykonany ma być tym samym pionkiem
 				anotherMove = Optional.of(target);
 			}
@@ -106,86 +136,67 @@ public class MoveValidator {
 		
 		return anotherMove;
 	}
-
-	public Optional<Point> advancedValidateMove(char playerColor, Board board, Point source, Point target, Optional<Point> nextMove) throws InvalidMoveException {
-		Optional<Point> anotherMove = validateMove(playerColor, board, source, target, nextMove);
-		// sprawdzanie, czy jest możliwe bicie przeciwnika jakimkolwiek pionkiem
-		List<PossibleMove> allPossibleMoves = generateAllPossibleMoves(playerColor, board, Optional.empty())
-		boolean beatingPossible = isBeatingPossible(allPossibleMoves);
-		if (beatingPossible) { //jeśli jest możliwe bicie
-			List<PossibleMove> beatingMoves = filterBeatingMoves(allPossibleMoves);
-			// czy ruch wykonywany jest pionkiem, który może wykonać bicie
-			if (!(beatingMoves.contains(new PossibleMove(source, target)))){
-				throw new InvalidMoveException("Beating move is possible.");
-			}
-		}
-
-		return anotherMove;
-	}
-
+	
 	private boolean isMoveValid(char playerColor, Board board, Point source, Point target, Optional<Point> nextMove) {
-		try{
-			validateMove(playerColor, board, source, target, nextMove);
+		try {
+			basicMoveValidation(playerColor, board, source, target, nextMove);
 			return true;
-		}catch (InvalidMoveException e){
+		} catch (InvalidMoveException e) {
 			return false;
 		}
 	}
 	
-	private List<PossibleMove> generatePossibleMoves(char playerColor, Board board, Point source, Optional<Point> nextMove){
+	private List<PossibleMove> generatePossibleMoves(char playerColor, Board board, Point source, Optional<Point> nextMove) {
 		List<PossibleMove> possibleMoves = new ArrayList<>();
 		char sourceField = board.getCell(source);
-
+		
 		// check if potential targets are valid
 		List<Point> potentialTargets = BoardLogic.potentialTargets(source, sourceField);
-		for(Point potentialTarget : potentialTargets){
-			if (isMoveValid(playerColor, board, source, potentialTarget, nextMove)){
+		for (Point potentialTarget : potentialTargets) {
+			if (isMoveValid(playerColor, board, source, potentialTarget, nextMove)) {
 				possibleMoves.add(new PossibleMove(source, potentialTarget));
 			}
 		}
-
+		
 		return possibleMoves;
 	}
 	
-	private List<PossibleMove> generateAllPossibleMoves(char playerColor, Board board, Optional<Point> nextMove){
+	private List<PossibleMove> generateAllPossibleMoves(char playerColor, Board board, Optional<Point> nextMove) {
 		List<PossibleMove> allPossibleMoves = new ArrayList<>();
-
+		
 		List<Point> playerPawns = BoardLogic.listAllPlayerPawns(playerColor, board);
-		for (Point playerPawn : playerPawns){
+		for (Point playerPawn : playerPawns) {
 			List<PossibleMove> possibleMoves = generatePossibleMoves(playerColor, board, playerPawn, nextMove);
 			allPossibleMoves.addAll(possibleMoves);
 		}
-
+		
 		return allPossibleMoves;
 	}
-
-	private boolean isBeatingPossible(List<PossibleMove> possibleMoves){
-		return possibleMoves.stream()
-				.anyMatch(move -> move.isBeating());
+	
+	private boolean isBeatingPossible(List<PossibleMove> possibleMoves) {
+		return possibleMoves.stream().anyMatch(PossibleMove::isBeating);
 	}
 	
-	private boolean isBeatingPossible(char playerColor, Board board, Optional<Point> nextMove){
+	private boolean isBeatingPossible(char playerColor, Board board, Optional<Point> nextMove) {
 		return isBeatingPossible(generateAllPossibleMoves(playerColor, board, nextMove));
 	}
 	
-	private boolean isBeatingPossible(char playerColor, Board board, Point source, Optional<Point> nextMove){
+	private boolean isBeatingPossible(char playerColor, Board board, Point source, Optional<Point> nextMove) {
 		return isBeatingPossible(generatePossibleMoves(playerColor, board, source, nextMove));
 	}
-
-	private List<PossibleMove> filterBeatingMoves(List<PossibleMove> moves){
-		return possibleMoves.stream()
-				.filter(move -> move.isBeating())
-				.collect(collect(Collectors.toList());
+	
+	private List<PossibleMove> filterBeatingMoves(List<PossibleMove> moves) {
+		return moves.stream().filter(PossibleMove::isBeating).collect(Collectors.toList());
 	}
-
-	private boolean isAnyMovePossible(char playerColor, Board board){
+	
+	public boolean isAnyMovePossible(char playerColor, Board board) {
 		List<Point> playerPawns = BoardLogic.listAllPlayerPawns(playerColor, board);
-		for (Point source : playerPawns){
+		for (Point source : playerPawns) {
 			char sourceField = board.getCell(source);
 			// check if potential targets are valid
 			List<Point> potentialTargets = BoardLogic.potentialTargets(source, sourceField);
-			for(Point potentialTarget : potentialTargets){
-				if (isMoveValid(playerColor, board, source, potentialTarget, Optional.empty())){
+			for (Point potentialTarget : potentialTargets) {
+				if (isMoveValid(playerColor, board, source, potentialTarget, Optional.empty())) {
 					return true;
 				}
 			}
