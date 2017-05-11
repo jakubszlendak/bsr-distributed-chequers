@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import bsr.project.checkers.client.ClientData;
 import bsr.project.checkers.game.validator.InvalidMoveException;
+import bsr.project.checkers.game.validator.NoNextMoveAvailable;
 import bsr.project.checkers.game.validator.MoveValidator;
 import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.protocol.BoardSymbols;
@@ -31,22 +32,21 @@ public class GameSession {
 	public void executeMove(ClientData player, Point source, Point target) throws InvalidMoveException {
 		
 		char playerColor = player == player1 ? BoardSymbols.WHITE_PAWN : BoardSymbols.BLACK_PAWN;
-		nextMove = validator.validateMove(playerColor, board, source, target, nextMove);
+		nextMove = validator.advancedValidateMove(playerColor, board, source, target, nextMove);
 
 		// move is valid - execute move
-		board.executeMove(playerColor, source, target, true);
+		BoardLogic.executeMove(board, playerColor, source, target, true);
 
 		// if current player does not make next move
 		if (!nextMove.isPresent()) {
 			// switch current player
 			currentPlayer = currentPlayer == BoardSymbols.WHITE_PAWN ? BoardSymbols.BLACK_PAWN : BoardSymbols.WHITE_PAWN;
+			// TODO jeśli nie ma możliwości wykonania ruchu - wygrana drugiego gracza - rzucić wyjątek
+			if (!validator.isAnyMovePossible(currentPlayer, board)){
+				throw new NoNextMoveAvailable();
+			}
 		}
 		
-		// TODO "Promocja piona do króla powoduje zakończenie posunięcia"
-
-		// TODO jeśli jest kolejny ruch, musi być wykonany tym samym pionkiem !!!
-		
-		// TODO jeśli nie ma możliwości wykonania ruchu - wygrana drugiego gracza
 	}
 	
 	

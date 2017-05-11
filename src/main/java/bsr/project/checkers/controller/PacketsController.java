@@ -308,6 +308,13 @@ public class PacketsController implements IEventObserver {
 		sendPacket(player, builder.responseMakeMove(true));
 		// update new board state
 		sendBoards(game);
+
+		// check if any next move is possible to make by next player
+		if (!game.isAnyMovePossible()) {
+			// send gameover message and exit
+			gameOver(game, game.getOpponent(game.getCurrentPlayer()), "No move is possible to make by next player");
+			return;
+		}
 		
 		// check if game is over
 		ClientData winner = game.getWinner();

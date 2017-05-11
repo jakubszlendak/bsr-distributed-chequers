@@ -3,6 +3,7 @@ package bsr.project.checkers.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.protocol.BoardSymbols;
 
 public class BoardLogic {
@@ -147,6 +148,28 @@ public class BoardLogic {
 		return playerPawns;
 	}
 
-	
+	public static void executeMove(Board board, char playerColor, Point source, Point target, boolean verbose){
+		// move source to target
+		char moving = board.getCell(source);
+		board.setCell(target, moving);
+		board.setCell(source, BoardSymbols.EMPTY); // replace by empty field
+		// remove (beat) all the pawns between source and target
+		List<Point> points = pointsBetween(source, target);
+		for (Point p : points) {
+			char cell = board.getCell(p);
+			if (cell != BoardSymbols.EMPTY) {
+				board.setCell(p, BoardSymbols.EMPTY);
+				if (verbose)
+					Logs.debug("Pawn " + cell + " on field " + p.toString() + " has been beaten");
+			}
+		}
+		// if pawn reached end of board
+		if (isOnBoardEnd(playerColor, target) && isPawn(moving)) {
+			// transform pawn to King
+			board.setCell(target, pawnToKing(moving));
+			if (verbose)
+				Logs.debug("pawn on " + target.toString() + " field has been transformed to king");
+		}
+	}
 
 }
