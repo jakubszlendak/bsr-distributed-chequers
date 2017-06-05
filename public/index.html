@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" data-framework="javascript">
+
+<head>
+	<meta charset="utf-8">
+	<title>Distributed Chequers v1</title>
+	<link href="//netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+	<link href="stylesheets/style.css" rel="stylesheet">
+	<script src="//code.jquery.com/jquery.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+	<h1 class="text-center">Distributed Chequers v1</h1>
+
+	<div id="loginForm" class="container">
+		<h3>Log in to start game</h3>
+		<form>
+			<div class="form-group">
+				<label for="loginInput">Username</label>
+				<input type="text" class="form-control" id="loginInput" placeholder="Username">
+			</div>
+			<div class="form-group">
+				<label for="passwdInput">Password</label>
+				<input type="password" class="form-control" id="passwdInput" placeholder="Password">
+			</div>
+			<button class="btn btn-default" id="loginButton">Submit</button>
+			<button class="btn btn-default" id="registerButton">Register</button>
+		</form>
+	</div>
+
+	<div id="playerList" class="container">
+		player list
+	</div>
+
+	<div id="game-board" class="container">
+		game board
+	</div>
+
+
+	<script src="js/vendor/EventEmitter.min.js"></script>
+	<script src="js/helpers.js"></script>
+	<script src="js/game.model.js"></script>
+	<script src="js/game.controller.js"></script>
+	<script src="js/game.view.js"></script>
+	<script src="js/app.js"></script>
+</body>
+
+</html>
