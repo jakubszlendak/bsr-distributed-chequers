@@ -13,6 +13,10 @@ mvn package
 ```
 java -cp target/server-igrek51-*.jar bsr.project.checkers.Main
 ```
+or
+```
+mvn exec:java
+```
 
 ### Testing:
 ```
