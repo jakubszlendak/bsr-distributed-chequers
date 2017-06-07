@@ -29,9 +29,22 @@
 		</form>
 	</div>
 
-	<div id="playerList" class="container">
-		player list
-	</div>
+	<script id="playerList" type="text/x-handlebars-template">
+		<div class="container">
+			<ul>
+				{{#each players}}
+				<li>
+					{{this.name}}
+					{{#if this.status}}
+					<button id="{{this.name}}_-_-_button"> Play! </button>
+					{{else}}
+					<p> Already playing... </p>
+					{{/if}}
+				</li>
+				{{/each}}
+			</ul>
+		</div>
+	</script>
 
 	<div id="game-board" class="container">
 		game board
@@ -39,6 +52,8 @@
 
 
 	<script src="js/vendor/EventEmitter.min.js"></script>
+	<script src="js/vendor/handlebars.min.js"></script>
+
 	<script src="js/helpers.js"></script>
 	<script src="js/game.model.js"></script>
 	<script src="js/game.controller.js"></script>

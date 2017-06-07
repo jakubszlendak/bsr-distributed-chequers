@@ -25,7 +25,7 @@
 
 		socket.onmessage = function(event) {
 			console.log('GameController#socket:onmessage', event.data)
-			var fields = event.data.split('#')
+			var fields = event.data.split('\n')[0].split('#')
 			if(fields.length) {
 				if(fields[0]==='LGN') {
 					model.setUserLoggedIn(!!+fields[1])
@@ -34,24 +34,24 @@
 					model.setUserCreated(!!+fields[1])
 				}
 				if(fields[0]==='LSP') {
-					let users = new Array(Math.floor((fields.length-2)/2))
-					console.log(users.length)
-					for (var i = 1; i < fields.length; i++) {
-						var element = fields[i];
-						users[Math.floor(i/2)] = users[Math.floor(i/2)] || {}
-						if(i%2) { //status
-							users[Math.floor(i/2)].status = element
-						} else {
-							users[Math.floor(i/2)].name = element
-						}
-						
+					var rawUsers = fields.slice(1, fields.length)
+					var users = new Array(rawUsers.length / 2)
+					for (var i = 0; i < rawUsers.length; i++) {
+						var element = rawUsers[i];
+						var userIndex = Math.floor(i/2)
+						users[userIndex] = users[userIndex] || {}
+						if(i%2) { //status (A or B)
+							users[userIndex].status = (element === 'A')
+						} else { //name
+							users[userIndex].name = element
+						}	
 					}
-					console.log(users)
 					model.setPlayerList(users)
 				}
 			}
 		}
 
+		//methods called by view
 		var apiPrototype = {
 			login: function login(username, password) {
 				if(socket.readyState === WebSocket.OPEN) {
@@ -68,6 +68,11 @@
 			getPlayerList: function() {
 				if(socket.readyState === WebSocket.OPEN) {				
 					socket.send(encodeMessage('LSP'))
+				}
+			},
+			requestGame:  function(opponentName) {
+				if(socket.readyState === WebSocket.OPEN) {				
+					socket.send(encodeMessage('RFP', [opponentName]))
 				}
 			}
 
