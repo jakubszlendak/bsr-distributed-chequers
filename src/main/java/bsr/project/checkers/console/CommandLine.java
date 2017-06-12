@@ -11,6 +11,7 @@ import bsr.project.checkers.game.Board;
 import bsr.project.checkers.game.GameSession;
 import bsr.project.checkers.logger.Logs;
 import bsr.project.checkers.server.ServerData;
+import bsr.project.checkers.users.User;
 
 public class CommandLine {
 	
@@ -87,6 +88,19 @@ public class CommandLine {
 				
 				number++;
 			}
+		} else if (cmd.equals("users")) {
+			int number = 1;
+			List<User> users = serverData.getUsersDatabase().getUsers();
+			Logs.info("Registered users [" + users.size() + "]:");
+			for (User user : users) {
+				StringBuilder sb = new StringBuilder();
+				sb.append(Integer.toString(number));
+				sb.append(". ");
+				sb.append(user.getLogin());
+				Logs.info(sb.toString());
+				
+				number++;
+			}
 		} else if (cmd.equals("kick all")) {
 			disconnectAll();
 		} else {
@@ -100,6 +114,7 @@ public class CommandLine {
 		Logs.info("server close - close server connection");
 		Logs.info("clients - list connected clients");
 		Logs.info("games - list active game sessions");
+		Logs.info("users - list registered users");
 		Logs.info("kick all - close all client connections");
 	}
 	
