@@ -1,11 +1,15 @@
 package bsr.project.checkers.logger;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Logs {
 	
 	// CONFIG
 	private static final LogLevel CONSOLE_LEVEL = LogLevel.ALL;
 	private static final LogLevel SHOW_TRACE_DETAILS_LEVEL = LogLevel.TRACE;
 	private static final boolean SHOW_EXCEPTIONS_TRACE = true;
+	private static final boolean SHOW_TIME = true;
 	
 	private static final Object PRINT_LOCK = new Object();
 	
@@ -94,9 +98,9 @@ public class Logs {
 				String fileName = ste.getFileName();
 				int lineNumber = ste.getLineNumber();
 				
-				consoleMessage = logPrefix + C_DIM + methodName + "(" + fileName + ":" + lineNumber + "): " + C_RESET + message;
+				consoleMessage = logPrefix + currentTimeSignature() + C_DIM + methodName + "(" + fileName + ":" + lineNumber + "): " + C_RESET + message;
 			} else {
-				consoleMessage = logPrefix + message;
+				consoleMessage = logPrefix + currentTimeSignature() + message;
 			}
 			
 			synchronized (PRINT_LOCK) {
@@ -119,6 +123,15 @@ public class Logs {
 				System.out.println(consoleMessage);
 			}
 		}
+	}
+
+	private static String currentTimeSignature(){
+		if (!SHOW_TIME){
+			return "";
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+		String formattedTime = LocalDateTime.now().format(formatter);
+		return C_DIM + "[" + formattedTime + "] " + C_RESET;
 	}
 	
 }
