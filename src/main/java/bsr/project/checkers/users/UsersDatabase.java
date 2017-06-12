@@ -23,6 +23,10 @@ public class UsersDatabase {
 	public UsersDatabase() {
 		loadUsers();
 	}
+
+	public List<User> getUsers() {
+		return users;
+	}
 	
 	public synchronized void loadUsers() {
 		Logs.debug("loading users database from file " + USERS_DATAFILE + "...");
