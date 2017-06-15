@@ -6,38 +6,57 @@
 	 * @constructor
 	 */
 	function GameModel() {
-		var board = []
-		var user = null
-		var userLoggedIn = false
-		var userCreated = false
-		var playerList = []
+		this.board = []
+		this.user = null
+		this.userLoggedIn = false
+		this.userCreated = false
+		this.playerList = []
+		this.invitingPlayer = null
+		this.invitedPlayer = null
+		this.invitedPlayerDecision = false
 
 		var eventEmitter = new EventEmitter()
 
 		return {
 			setUser: function(userCredentials) {
-				user = userCredentials
-				eventEmitter.emitEvent('userChanged', board)
+				this.user = userCredentials
+				eventEmitter.emitEvent('userChanged', this.board)
 			},
 
 			setBoard: function(newBoard) {
-				board = newBoard
-				eventEmitter.emitEvent('boardChanged', board)
+				this.board = newBoard
+				eventEmitter.emitEvent('boardChanged', this.board)
 			},
 
 			setUserLoggedIn: function(isLoggedIn) {
-				userLoggedIn = isLoggedIn
-				eventEmitter.emitEvent('login', [isLoggedIn? user : false])
+				this.userLoggedIn = isLoggedIn
+				eventEmitter.emitEvent('login', [isLoggedIn? this.user : false])
 			},
 
 			setUserCreated: function(isCreated) {
-				userCreated = isCreated
-				eventEmitter.emitEvent('register', [isCreated? user : false])
+				this.userCreated = isCreated
+				eventEmitter.emitEvent('register', [isCreated? this.user : false])
 			},
 
 			setPlayerList: function(list) {
-				playerList = list
-				eventEmitter.emitEvent('playerList', [list])
+				this.playerList = list.filter( function (item) {
+					return item.name !== this.user.username //filter yourself from list
+				}, this)
+				eventEmitter.emitEvent('playerList', [this.playerList])
+			},
+
+			setInvitingPlayer: function(playerName) {
+				eventEmitter.emitEvent('playerInviting', [playerName])
+			},
+
+			setInvitedPlayer: function( player ) {
+				this.invitedPlayer = player
+				eventEmitter.emitEvent('invitedPlayer', [player])				
+			},
+
+			setInvitedPlayerDecision: function(decision) {
+				this.invitedPlayerDecision = decision
+				eventEmitter.emitEvent('invitedPlayerDecision', [decision])
 			},
 
 			addEventListener: function(event, handler) {

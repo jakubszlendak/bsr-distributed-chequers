@@ -11,9 +11,40 @@
 </head>
 
 <body>
-	<h1 class="text-center">Distributed Chequers v1</h1>
+
+	<script id="navbar" type="text/x-handlebars-template">
+		{{#if loggedIn}}
+		<nav class="navbar navbar-default navbar-static-top">
+			<div class="container">
+				<div class="navbar-header">
+					<a class="navbar-brand">Distributed Chequers</a>
+				</div>
+				<div class="navbar-collapse collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li class="active"><a>{{username}}</a></li>
+						<li><a href="/">Logout</a></li>
+					</ul>
+				</div>
+				<!--/.nav-collapse -->
+			</div>
+			<!--/.container-fluid -->
+		</nav>
+
+		{{/if}}
+	</script>
+	<script id="notificationBar" type="text/x-handlebars-template">
+		<div class="notification-container">
+			<div class="alert alert-{{clazz}} alert-dismissable">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> {{message}}
+			</div>
+		</div>
+	</script>
+
+
+	
 
 	<div id="loginForm" class="container">
+		<h1 class="text-center">Distributed Chequers v1</h1>
 		<h3>Log in to start game</h3>
 		<form>
 			<div class="form-group">
@@ -31,14 +62,14 @@
 
 	<script id="playerList" type="text/x-handlebars-template">
 		<div class="container">
+			<h3>GAME ROOM:</h3>
+			
 			<ul>
 				{{#each players}}
 				<li>
-					{{this.name}}
-					{{#if this.status}}
-					<button id="{{this.name}}_-_-_button"> Play! </button>
-					{{else}}
-					<p> Already playing... </p>
+					{{this.name}} {{#if this.status}}
+					<button id="{{this.name}}_-_-_button" class="btn btn-default"> Play! </button> {{else}}
+					<span class="text-danger"> Already playing... </span>
 					{{/if}}
 				</li>
 				{{/each}}

@@ -27,12 +27,16 @@
 			console.log('GameController#socket:onmessage', event.data)
 			var fields = event.data.split('\n')[0].split('#')
 			if(fields.length) {
+
+				// login - response
 				if(fields[0]==='LGN') {
 					model.setUserLoggedIn(!!+fields[1])
 				}
+				// create account - response
 				if(fields[0]==='CRA') {
 					model.setUserCreated(!!+fields[1])
 				}
+				// list players - response
 				if(fields[0]==='LSP') {
 					var rawUsers = fields.slice(1, fields.length)
 					var users = new Array(rawUsers.length / 2)
@@ -48,6 +52,17 @@
 					}
 					model.setPlayerList(users)
 				}
+				// request play - someone invites you
+				if(fields[0]==='RP1') {
+					var opponentName = fields[1]
+					model.setInvitingPlayer(opponentName)
+				}
+				// response for your invite 
+				if(fields[0]==='RP2') {
+					var opponentDecision = +fields[1]
+					model.setInvitedPlayerDecision(opponentDecision)
+				}
+
 			}
 		}
 
@@ -71,8 +86,14 @@
 				}
 			},
 			requestGame:  function(opponentName) {
-				if(socket.readyState === WebSocket.OPEN) {				
+				if(socket.readyState === WebSocket.OPEN) {	
+					model.setInvitedPlayer(opponentName)			
 					socket.send(encodeMessage('RFP', [opponentName]))
+				}
+			},
+			respondForGameRequest: function(decision) {
+				if(socket.readyState === WebSocket.OPEN) {				
+					socket.send(encodeMessage('RP1', [+decision]))
 				}
 			}
 
