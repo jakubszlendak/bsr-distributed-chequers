@@ -77,6 +77,20 @@
 		</div>
 	</script>
 
+
+	<script id="gameBoard" type="text/x-handlebars-template">
+		<div class="container">
+			{{#each rows}}
+				<div class="row">
+					{{#each this}}
+						<div class="col col-md-8"> {{this}} </div>
+					{{/each}}
+
+				</div>
+			{{/each}}
+		</div>
+	</script>
+
 	<div id="game-board" class="container">
 		game board
 	</div>

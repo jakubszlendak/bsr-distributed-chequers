@@ -9,19 +9,18 @@
 		var loginPanel = qs('#loginForm')
 		var playerList = qs('#playerList')
 		var notificationBar = qs('#notificationBar')
+		var gameBoard = qs('#gameBoard')
 		var navbar = qs('#navbar')
 
 		var playerListTemplate = Handlebars.compile(playerList.textContent)
 		var notificationBarTemplate = Handlebars.compile(notificationBar.textContent)
+		var gameBoardTemplate = Handlebars.compile(gameBoard.textContent)
 		var navbarTemplate = Handlebars.compile(navbar.textContent)
 
 		var loginBtn = qs('#loginButton')
 		var registerBtn = qs('#registerButton')
 		var usernameInput = qs('#loginInput')
 		var passwdInput = qs('#passwdInput')
-
-		var playerListPool = null
-
 
 		function setupUserUI(user) {
 			renderItem('#navbar', navbarTemplate, {
@@ -31,9 +30,7 @@
 			loginPanel.style.display = 'none'
 			controller.getPlayerList()
 
-			playerListPool = setInterval(function () {
-				controller.getPlayerList()
-			}, 1000)
+			controller.pollPlayerList()
 		}
 
 
@@ -111,6 +108,15 @@
 					message: 'Player ' + model.invitedPlayer + ' does not want to play with you :('
 				})
 			}
+		})
+
+		model.addEventListener('gameStarted', function () {
+			controller.stopPollingPlayerList()
+			hideItem('#playerList')
+		})
+
+		model.addEventListener('boardChanged', function (newBoard) {
+			renderItem('#gameBoard', gameBoardTemplate, {rows: newBoard})
 		})
 
 		loginBtn.addEventListener('click', function (e) {

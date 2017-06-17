@@ -25,7 +25,19 @@
 
 		socket.onmessage = function(event) {
 			console.log('GameController#socket:onmessage', event.data)
-			var fields = event.data.split('\n')[0].split('#')
+			// deal with 'sticky' messages
+			var messages = event.data.split('\n').filter( function(msg) { return !!msg })
+
+			// if there are many messages sticked together, defer handling
+			if(messages.length > 1) {
+				messages.slice(1).forEach(function (message) {
+					setTimeout(function () {
+						socket.onmessage.call(this, { data: message })
+					})
+				})
+			}
+
+			var fields = messages[0].split('#')
 			if(fields.length) {
 
 				// login - response
@@ -62,6 +74,16 @@
 					var opponentDecision = +fields[1]
 					model.setInvitedPlayerDecision(opponentDecision)
 				}
+				//game init
+				if(fields[0]==='INI') {
+					var playerColor = fields[1]
+					model.setGameStarted(playerColor)
+				}
+				//board
+				if(fields[0]==='CHB') {
+					var board = decodeBoard(fields[1])
+					model.setBoard(board)
+				}
 
 			}
 		}
@@ -85,6 +107,19 @@
 					socket.send(encodeMessage('LSP'))
 				}
 			},
+
+			pollPlayerList: function() {
+				if(this.playerListPoll) clearInterval(this.playerListPoll)
+
+				this.playerListPoll = setInterval(function(){
+					this.getPlayerList()
+				}.bind(this), 10000)
+			},
+
+			stopPollingPlayerList: function() {
+				if(this.playerListPoll) clearInterval(this.playerListPoll)
+			},
+
 			requestGame:  function(opponentName) {
 				if(socket.readyState === WebSocket.OPEN) {	
 					model.setInvitedPlayer(opponentName)			
@@ -110,6 +145,14 @@
 			command+= '#' + element
 		})
 		return command + '\n'
+	}
+
+	function decodeBoard(data) {
+		var board = new Array(8)
+		for (var i = 0; i < 8; i++) {
+			board[i] = data.slice(i, i+8).split('')
+		}
+		return board
 	}
 
 	

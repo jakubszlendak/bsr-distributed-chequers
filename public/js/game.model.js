@@ -20,12 +20,12 @@
 		return {
 			setUser: function(userCredentials) {
 				this.user = userCredentials
-				eventEmitter.emitEvent('userChanged', this.board)
+				eventEmitter.emitEvent('userChanged', [this.user])
 			},
 
 			setBoard: function(newBoard) {
 				this.board = newBoard
-				eventEmitter.emitEvent('boardChanged', this.board)
+				eventEmitter.emitEvent('boardChanged', [this.board])
 			},
 
 			setUserLoggedIn: function(isLoggedIn) {
@@ -58,6 +58,13 @@
 				this.invitedPlayerDecision = decision
 				eventEmitter.emitEvent('invitedPlayerDecision', [decision])
 			},
+
+			setGameStarted: function(color) {
+				this.playerColor = color
+				eventEmitter.emitEvent('gameStarted')
+			},
+
+
 
 			addEventListener: function(event, handler) {
 				eventEmitter.addListener(event, handler)
