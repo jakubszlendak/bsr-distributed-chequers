@@ -1,3 +1,4 @@
+/* global EventEmitter */
 (function (window) {
 	'use strict';
 
@@ -60,7 +61,8 @@
 			},
 
 			setGameStarted: function(color) {
-				this.playerColor = color
+				var colors = {C: 'black', B: 'white'}
+				this.playerColor = colors[color]
 				eventEmitter.emitEvent('gameStarted')
 			},
 

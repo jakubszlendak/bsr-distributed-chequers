@@ -1,3 +1,4 @@
+/* global qs, Handlebars */
 (function (window) {
 	'use strict';
 
@@ -33,9 +34,6 @@
 			controller.pollPlayerList()
 		}
 
-
-		model.addEventListener('boardChanged')
-
 		model.addEventListener('login', function (user) {
 			if (!user) {
 				renderItem('#notificationBar', notificationBarTemplate, {
@@ -43,7 +41,7 @@
 					message: 'Login failed!'
 				})
 			} else {
-				renderItem('#notificationBar', notificationBarTemplate, {
+				renderNotification('#notificationBar', notificationBarTemplate, {
 					clazz: 'success',
 					message: 'User ' + user.username + ' logged in.'
 				})
@@ -63,7 +61,7 @@
 					username: user.username
 				})
 			} else {
-				renderItem('#notificationBar', notificationBarTemplate, {
+				renderNotification('#notificationBar', notificationBarTemplate, {
 					clazz: 'success',
 					message: 'User ' + user.username + ' registered and logged in.'
 				})
@@ -116,7 +114,7 @@
 		})
 
 		model.addEventListener('boardChanged', function (newBoard) {
-			renderItem('#gameBoard', gameBoardTemplate, {rows: newBoard})
+			renderItem('#gameBoard', gameBoardTemplate, {playerColor: model.playerColor, rows: newBoard})
 		})
 
 		loginBtn.addEventListener('click', function (e) {
@@ -156,4 +154,12 @@ function renderItem(idSelector, template, data) {
 
 function hideItem(idSelector) {
 	qs(idSelector).style.display = 'none'
+}
+
+
+function renderNotification(idSelector, template, data, duration) {
+	renderItem(idSelector, template, data)
+	setTimeout(function() {
+		hideItem(idSelector)
+	}, duration || 5000)
 }

@@ -41,7 +41,7 @@
 	</script>
 
 
-	
+
 
 	<div id="loginForm" class="container">
 		<h1 class="text-center">Distributed Chequers v1</h1>
@@ -63,14 +63,13 @@
 	<script id="playerList" type="text/x-handlebars-template">
 		<div class="container">
 			<h3>GAME ROOM:</h3>
-			
+			{{#unless players.length}} No players available! {{/unless}}
 			<ul>
 				{{#each players}}
 				<li>
 					{{this.name}} {{#if this.status}}
 					<button id="{{this.name}}_-_-_button" class="btn btn-default"> Play! </button> {{else}}
-					<span class="text-danger"> Already playing... </span>
-					{{/if}}
+					<span class="text-danger"> Already playing... </span> {{/if}}
 				</li>
 				{{/each}}
 			</ul>
@@ -79,21 +78,34 @@
 
 
 	<script id="gameBoard" type="text/x-handlebars-template">
-		<div class="container">
+		<h3 class="text-center">You are playing {{playerColor}}</h3> 
+		<table>
 			{{#each rows}}
-				<div class="row">
-					{{#each this}}
-						<div class="col col-md-8"> {{this}} </div>
-					{{/each}}
-
-				</div>
+			<tr>
+				{{#each this}}
+				<td>
+					{{#if this.hasChecker}}
+					<div class="checker {{this.color}}">
+						
+					</div>
+					{{/if}}
+				</td>
+				{{/each}}
+			</tr>
 			{{/each}}
-		</div>
-	</script>
+		</table>
 
-	<div id="game-board" class="container">
-		game board
-	</div>
+		<!--{{#each rows}}
+		<div class="row">
+			<div class="col col-md-2"> </div>
+			{{#each this}}
+			<div class="col col-md-1"> {{this}} </div>
+			{{/each}}
+			<div class="col col-md-2"> </div>
+		</div>
+		{{/each}}
+		</div>-->
+	</script>
 
 
 	<script src="js/vendor/EventEmitter.min.js"></script>
