@@ -79,14 +79,16 @@
 
 	<script id="gameBoard" type="text/x-handlebars-template">
 		<h3 class="text-center">You are playing {{playerColor}}</h3> 
+		
 		<table>
 			{{#each rows}}
 			<tr>
 				{{#each this}}
-				<td>
+				<td id="field_{{this.index}}" class="field {{this.fieldOccupation}}">
 					{{#if this.hasChecker}}
-					<div class="checker {{this.color}}">
+					<div id="checker-{{this-color}}_{{this.index}}" class="checker {{this.color}}">
 						
+
 					</div>
 					{{/if}}
 				</td>
@@ -94,6 +96,10 @@
 			</tr>
 			{{/each}}
 		</table>
+
+		{{#if this.yourMove}}
+		<h4>Your move!</h4>
+		{{/if}}
 
 		<!--{{#each rows}}
 		<div class="row">

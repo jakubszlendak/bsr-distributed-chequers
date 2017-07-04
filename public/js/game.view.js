@@ -1,4 +1,4 @@
-/* global qs, Handlebars */
+/* global qs, qsa, Handlebars */
 (function (window) {
 	'use strict';
 
@@ -113,13 +113,15 @@
 			hideItem('#playerList')
 		})
 
-		model.addEventListener('boardChanged', function (newBoard) {
-			renderItem('#gameBoard', gameBoardTemplate, {playerColor: model.playerColor, rows: newBoard})
+		model.addEventListener('boardChanged', function () {
+			renderBoard('#gameBoard', gameBoardTemplate, model, controller)
+		})
+
+		model.addEventListener('playerMove', function () {
+			renderBoard('#gameBoard', gameBoardTemplate, model, controller)			
 		})
 
 		loginBtn.addEventListener('click', function (e) {
-			// console.log('GameView#loginBtn:click')
-
 			e.preventDefault()
 			var login = usernameInput.value
 			var pass = passwdInput.value
@@ -128,7 +130,6 @@
 		}, false)
 
 		registerBtn.addEventListener('click', function (e) {
-			// console.log('GameView#registerBtn:click')
 			e.preventDefault()
 			var login = usernameInput.value
 			var pass = passwdInput.value
@@ -142,6 +143,37 @@
 	window.app.GameView = GameView;
 }(window));
 
+
+function renderBoard(idSelector, template, model, controller) {
+	var boardData = {
+		playerColor: model.playerColor, 
+		rows: model.board, 
+		yourMove: model.playerMove
+	}
+	renderItem(idSelector, template, boardData)
+	console.log('.checker.'+model.playerColor)
+
+
+	var checkerToMove = null
+
+	qsa('.checker.'+model.playerColor).forEach(function(element){
+		element.addEventListener('click', function(e){
+			markChecker('#'+element.id)
+			var coords = element.id.split('_')[1].split('-')
+			checkerToMove = [ +coords[0], +coords[1] ]
+		})
+	})
+
+	qsa('.field.empty').forEach(function (element) {
+		element.addEventListener('click', function(e){
+			if(checkerToMove){
+				var coords = element.id.split('_')[1].split('-')
+				var destination = [ +coords[0], +coords[1] ]
+				controller.moveChecker(checkerToMove, destination)
+			}
+		})
+	})
+}
 
 function renderItem(idSelector, template, data) {
 	var itemHTML = template(data)
@@ -162,4 +194,10 @@ function renderNotification(idSelector, template, data, duration) {
 	setTimeout(function() {
 		hideItem(idSelector)
 	}, duration || 5000)
+}
+
+function markChecker(selector) {
+	console.log('markChecker', qs(selector))
+	qsa('.checker').forEach(function(e) {e.setAttribute('style', 'box-shadow: none;')})
+	qs(selector).setAttribute('style', 'box-shadow: 0px 0px 3px 4px red;')
 }

@@ -88,6 +88,9 @@
 					var board = decodeBoard(fields[1])
 					model.setBoard(board)
 				}
+				if (fields[0] === 'YMV') {
+					model.setPlayerMove(true)
+				}
 
 			}
 		}
@@ -140,6 +143,11 @@
 				if (socket.readyState === WebSocket.OPEN) {
 					socket.send(encodeMessage('RP1', [+decision]))
 				}
+			},
+			moveChecker: function(from, to) {
+				if (socket.readyState === WebSocket.OPEN) {
+					socket.send(encodeMessage('MOV', from.concat(to)))
+				}
 			}
 
 		}
@@ -162,11 +170,13 @@
 		var colors = { C: 'black', B: 'white' }
 		for (var i = 0; i < 8; i++) {
 			var row = data.slice(i*8, (i + 1)*8).split('')
-			console.log('row', row)
-			board[i] = row.map(function (item) {
+			// console.log('row', row)
+			board[i] = row.map(function (item, indx) {
 				return {
+					index: '' + i + '-' + indx,
 					hasChecker: item !== 'O',
-					color: colors[item]
+					color: colors[item],
+					fieldOccupation: item !== 'O' ? 'occupied' : 'empty'
 				}
 			})
 

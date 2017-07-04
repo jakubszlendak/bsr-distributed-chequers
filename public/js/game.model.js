@@ -15,6 +15,7 @@
 		this.invitingPlayer = null
 		this.invitedPlayer = null
 		this.invitedPlayerDecision = false
+		this.playerColor = null
 
 		var eventEmitter = new EventEmitter()
 
@@ -66,7 +67,10 @@
 				eventEmitter.emitEvent('gameStarted')
 			},
 
-
+			setPlayerMove: function(isYourMove) {
+				this.playerMove = isYourMove
+				eventEmitter.emitEvent('playerMove', [this.playerMove])
+			},
 
 			addEventListener: function(event, handler) {
 				eventEmitter.addListener(event, handler)
