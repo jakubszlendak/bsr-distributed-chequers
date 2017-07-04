@@ -160,7 +160,7 @@ function renderBoard(idSelector, template, model, controller) {
 		element.addEventListener('click', function(e){
 			markChecker('#'+element.id)
 			var coords = element.id.split('_')[1].split('-')
-			checkerToMove = [ +coords[0], +coords[1] ]
+			checkerToMove = [ +coords[1] , +coords[0] ]
 		})
 	})
 
@@ -168,7 +168,7 @@ function renderBoard(idSelector, template, model, controller) {
 		element.addEventListener('click', function(e){
 			if(checkerToMove){
 				var coords = element.id.split('_')[1].split('-')
-				var destination = [ +coords[0], +coords[1] ]
+				var destination = [ +coords[1], +coords[0]  ]
 				controller.moveChecker(checkerToMove, destination)
 			}
 		})
