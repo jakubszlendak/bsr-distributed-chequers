@@ -80,8 +80,13 @@
 				}
 				//game init
 				if (fields[0] === 'INI') {
-					var playerColor = fields[1]
+					var colors = {
+						C: 'black',
+						B: 'white'
+					}
+					var playerColor = colors[fields[1]]
 					model.setGameStarted(playerColor)
+					model.logEvent('Starting game as ' + playerColor)
 				}
 				//board
 				if (fields[0] === 'CHB') {
@@ -90,6 +95,12 @@
 				}
 				if (fields[0] === 'YMV') {
 					model.setPlayerMove(true)
+					model.logEvent('Waiting for your move...')
+				}
+				if (fields[0] === 'MOV') {
+					if (!(+fields[1])) {
+						model.logEvent('Invalid move')
+					}
 				}
 
 			}
@@ -144,9 +155,10 @@
 					socket.send(encodeMessage('RP1', [+decision]))
 				}
 			},
-			moveChecker: function(from, to) {
+			moveChecker: function (from, to) {
 				if (socket.readyState === WebSocket.OPEN) {
 					socket.send(encodeMessage('MOV', from.concat(to)))
+					model.logEvent('You moved from ' + from + ' to ' + to)
 				}
 			}
 
@@ -167,9 +179,12 @@
 
 	function decodeBoard(data) {
 		var board = new Array(8)
-		var colors = { C: 'black', B: 'white' }
+		var colors = {
+			C: 'black',
+			B: 'white'
+		}
 		for (var i = 0; i < 8; i++) {
-			var row = data.slice(i*8, (i + 1)*8).split('')
+			var row = data.slice(i * 8, (i + 1) * 8).split('')
 			// console.log('row', row)
 			board[i] = row.map(function (item, indx) {
 				return {

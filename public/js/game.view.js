@@ -11,11 +11,13 @@
 		var playerList = qs('#playerList')
 		var notificationBar = qs('#notificationBar')
 		var gameBoard = qs('#gameBoard')
+		var eventLog = qs('#eventLog')
 		var navbar = qs('#navbar')
 
 		var playerListTemplate = Handlebars.compile(playerList.textContent)
 		var notificationBarTemplate = Handlebars.compile(notificationBar.textContent)
 		var gameBoardTemplate = Handlebars.compile(gameBoard.textContent)
+		var eventLogTemplate = Handlebars.compile(eventLog.textContent)
 		var navbarTemplate = Handlebars.compile(navbar.textContent)
 
 		var loginBtn = qs('#loginButton')
@@ -121,6 +123,10 @@
 			renderBoard('#gameBoard', gameBoardTemplate, model, controller)			
 		})
 
+		model.addEventListener('eventLogged', function () {
+			renderItem('#eventLog', eventLogTemplate, {events: model.eventLog})			
+		})
+
 		loginBtn.addEventListener('click', function (e) {
 			e.preventDefault()
 			var login = usernameInput.value
@@ -146,6 +152,7 @@
 
 function renderBoard(idSelector, template, model, controller) {
 	var boardData = {
+		opponentName: model.opponentName,
 		playerColor: model.playerColor, 
 		rows: model.board, 
 		yourMove: model.playerMove

@@ -78,8 +78,11 @@
 
 
 	<script id="gameBoard" type="text/x-handlebars-template">
-		<h3 class="text-center">You are playing {{playerColor}}</h3> 
-		
+		<h3 class="text-center" style="padding-bottom:40px">Playing with {{opponentName}}. You are playing {{playerColor}}</h3> 
+		{{#if this.yourMove}}
+			<h4 class="text-center text-success">Your move!</h4>
+		{{/if}}
+
 		<table>
 			{{#each rows}}
 			<tr>
@@ -97,10 +100,7 @@
 			{{/each}}
 		</table>
 
-		{{#if this.yourMove}}
-		<h4>Your move!</h4>
-		{{/if}}
-
+		
 		<!--{{#each rows}}
 		<div class="row">
 			<div class="col col-md-2"> </div>
@@ -111,6 +111,15 @@
 		</div>
 		{{/each}}
 		</div>-->
+	</script>
+
+	<script id="eventLog" type="text/x-handlebars-template">
+		<hr>
+		<pre> 
+			{{#each events}}
+				<p> <strong>{{this.date}}</strong> {{this.event}} </p>
+			{{/each}}
+		</pre>
 	</script>
 
 
