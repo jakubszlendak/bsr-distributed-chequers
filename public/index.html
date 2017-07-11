@@ -78,9 +78,10 @@
 
 
 	<script id="gameBoard" type="text/x-handlebars-template">
-		<h3 class="text-center" style="padding-bottom:40px">Playing with {{opponentName}}. You are playing {{playerColor}}</h3> 
-		{{#if this.yourMove}}
-			<h4 class="text-center text-success">Your move!</h4>
+		<h3 class="text-center">Playing with {{opponentName}}. You are playing {{playerColor}}</h3>
+		<button id="giveUpButton" class="btn btn-danger center-block">Give Up!</button> {{#if this.yourMove}}
+		<br>
+		<h4 class="text-center text-success">Your move!</h4>
 		{{/if}}
 
 		<table>
@@ -89,35 +90,33 @@
 				{{#each this}}
 				<td id="field_{{this.index}}" class="field {{this.fieldOccupation}}">
 					{{#if this.hasChecker}}
-					<div id="checker-{{this-color}}_{{this.index}}" class="checker {{this.color}}">
-						
-
-					</div>
+					<div id="checker-{{this-color}}_{{this.index}}" class="checker {{this.type}} {{this.color}}"></div>
 					{{/if}}
 				</td>
 				{{/each}}
 			</tr>
 			{{/each}}
 		</table>
+	</script>
 
-		
-		<!--{{#each rows}}
-		<div class="row">
-			<div class="col col-md-2"> </div>
-			{{#each this}}
-			<div class="col col-md-1"> {{this}} </div>
-			{{/each}}
-			<div class="col col-md-2"> </div>
+	<script id="resultBoard" type="text/x-handlebars-template">
+		<div class="text-center">
+			{{#if youWon}}
+			<h1>You won!</h1>
+			{{/if}} {{#unless youWon}}
+			<h1>You lost!</h1>
+			{{/unless}}
+			<p>{{reason}}</p>
+			<button id="backToPlayerListButton" class="btn btn-success center-block">Back to Game Room</button>
+
 		</div>
-		{{/each}}
-		</div>-->
 	</script>
 
 	<script id="eventLog" type="text/x-handlebars-template">
 		<hr>
 		<pre> 
 			{{#each events}}
-				<p> <strong>{{this.date}}</strong> {{this.event}} </p>
+				<p class="log {{this.level}}"> <strong>{{this.date}}</strong> {{this.event}} </p>
 			{{/each}}
 		</pre>
 	</script>

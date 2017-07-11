@@ -102,12 +102,21 @@
 						model.logEvent('Invalid move')
 					}
 				}
+				if (fields[0] === 'EOG') {
+					model.logEvent('End of game, winner is: ' + fields[1] + ' ' +fields[2] || '', 'info')
+					model.setGameResult(fields[1], fields[2])
+					model.clearLog()
+				}
+				if (fields[0] === 'ERR') {
+					model.logEvent('Error: ' + fields[1], 'error')
+				}
 
 			}
 		}
 
 		//methods called by view
 		var apiPrototype = {
+			socket: socket, //for debug
 			login: function login(username, password) {
 				if (socket.readyState === WebSocket.OPEN) {
 					model.setUser({
@@ -160,6 +169,11 @@
 					socket.send(encodeMessage('MOV', from.concat(to)))
 					model.logEvent('You moved from ' + from + ' to ' + to)
 				}
+			},
+			giveUp: function () {
+				if (socket.readyState === WebSocket.OPEN) {
+					socket.send(encodeMessage('GVU'))
+				}
 			}
 
 		}
@@ -181,7 +195,9 @@
 		var board = new Array(8)
 		var colors = {
 			C: 'black',
-			B: 'white'
+			B: 'white',
+			D: 'white', //white king,
+			E: 'black' //black king
 		}
 		for (var i = 0; i < 8; i++) {
 			var row = data.slice(i * 8, (i + 1) * 8).split('')
@@ -191,7 +207,8 @@
 					index: '' + i + '-' + indx,
 					hasChecker: item !== 'O',
 					color: colors[item],
-					fieldOccupation: item !== 'O' ? 'occupied' : 'empty'
+					fieldOccupation: item !== 'O' ? 'occupied' : 'empty',
+					type: item === 'D' || item === 'E' ? 'king' : ''
 				}
 			})
 

@@ -58,3 +58,18 @@ tr:nth-child(even) td:nth-child(odd) {
 .checker.black {
   background-color: black
 }
+
+.checker.king {
+  height: 60px;
+  width: 60px;
+  border-width: 10px;
+  border-color: #4286f4;
+}
+
+.log.error {
+  color: red;
+}
+
+.log.info {
+  color: green;
+}

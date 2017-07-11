@@ -76,14 +76,26 @@
 			this.eventEmitter.emitEvent('playerMove', [this.playerMove])
 		}
 
-		GameModel.prototype.logEvent= function (event) {
+		GameModel.prototype.setGameResult= function (winner, reason) {
+			this.winner = winner
+			this.playerWon = winner === this.user.username
+			this.gameEndReason = reason
+			this.eventEmitter.emitEvent('endOfGame')
+		}
+
+
+		GameModel.prototype.logEvent= function (event, level) {
 			this.eventLog.push({
 				date: new Date(),
-				event: event
+				event: event, 
+				level: level || 'log'
 			})
 			if(this.eventLog.length>5) this.eventLog = this.eventLog.slice(this.eventLog.length - 5, this.eventLog.length)
-			this.eventEmitter.emitEvent('eventLogged', [this.eventLog])
-			
+			this.eventEmitter.emitEvent('eventLogged', [this.eventLog])	
+		}
+
+		GameModel.prototype.clearLog= function () {
+			this.eventLog = []
 		}
 
 		GameModel.prototype.addEventListener= function (event, handler) {

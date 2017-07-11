@@ -11,12 +11,14 @@
 		var playerList = qs('#playerList')
 		var notificationBar = qs('#notificationBar')
 		var gameBoard = qs('#gameBoard')
+		var resultBoard = qs('#resultBoard')
 		var eventLog = qs('#eventLog')
 		var navbar = qs('#navbar')
 
 		var playerListTemplate = Handlebars.compile(playerList.textContent)
 		var notificationBarTemplate = Handlebars.compile(notificationBar.textContent)
 		var gameBoardTemplate = Handlebars.compile(gameBoard.textContent)
+		var resultBoardTemplate = Handlebars.compile(resultBoard.textContent)
 		var eventLogTemplate = Handlebars.compile(eventLog.textContent)
 		var navbarTemplate = Handlebars.compile(navbar.textContent)
 
@@ -73,6 +75,9 @@
 		})
 
 		model.addEventListener('playerList', function (list) {
+			hideItem('#eventLog')
+			hideItem('#resultBoard')
+			hideItem('#gameBoard')
 			renderItem('#playerList', playerListTemplate, {
 				players: list
 			})
@@ -113,6 +118,7 @@
 		model.addEventListener('gameStarted', function () {
 			controller.stopPollingPlayerList()
 			hideItem('#playerList')
+			hideItem('#resultBoard')			
 		})
 
 		model.addEventListener('boardChanged', function () {
@@ -120,11 +126,27 @@
 		})
 
 		model.addEventListener('playerMove', function () {
-			renderBoard('#gameBoard', gameBoardTemplate, model, controller)			
+			renderBoard('#gameBoard', gameBoardTemplate, model, controller)
+		})
+
+		model.addEventListener('endOfGame', function () {
+			hideItem('#gameBoard')
+			hideItem('#eventLog')
+			renderItem('#resultBoard', resultBoardTemplate, {
+				winner: model.winner,
+				youWon: model.playerWon,
+				reason: model.gameEndReason
+			})
+			qs('#backToPlayerListButton').addEventListener('click', function(){
+				hideItem('#resultBoard')
+				controller.getPlayerList()
+			})
 		})
 
 		model.addEventListener('eventLogged', function () {
-			renderItem('#eventLog', eventLogTemplate, {events: model.eventLog})			
+			renderItem('#eventLog', eventLogTemplate, {
+				events: model.eventLog
+			})
 		})
 
 		loginBtn.addEventListener('click', function (e) {
@@ -153,32 +175,35 @@
 function renderBoard(idSelector, template, model, controller) {
 	var boardData = {
 		opponentName: model.opponentName,
-		playerColor: model.playerColor, 
-		rows: model.board, 
+		playerColor: model.playerColor,
+		rows: model.board,
 		yourMove: model.playerMove
 	}
 	renderItem(idSelector, template, boardData)
-	console.log('.checker.'+model.playerColor)
 
 
 	var checkerToMove = null
 
-	qsa('.checker.'+model.playerColor).forEach(function(element){
-		element.addEventListener('click', function(e){
-			markChecker('#'+element.id)
+	qsa('.checker.' + model.playerColor).forEach(function (element) {
+		element.addEventListener('click', function (e) {
+			markChecker('#' + element.id)
 			var coords = element.id.split('_')[1].split('-')
-			checkerToMove = [ +coords[1] , +coords[0] ]
+			checkerToMove = [+coords[1], +coords[0]]
 		})
 	})
 
 	qsa('.field.empty').forEach(function (element) {
-		element.addEventListener('click', function(e){
-			if(checkerToMove){
+		element.addEventListener('click', function (e) {
+			if (checkerToMove) {
 				var coords = element.id.split('_')[1].split('-')
-				var destination = [ +coords[1], +coords[0]  ]
+				var destination = [+coords[1], +coords[0]]
 				controller.moveChecker(checkerToMove, destination)
 			}
 		})
+	})
+
+	qs('#giveUpButton').addEventListener('click', function () {
+		controller.giveUp()
 	})
 }
 
@@ -198,13 +223,14 @@ function hideItem(idSelector) {
 
 function renderNotification(idSelector, template, data, duration) {
 	renderItem(idSelector, template, data)
-	setTimeout(function() {
+	setTimeout(function () {
 		hideItem(idSelector)
 	}, duration || 5000)
 }
 
 function markChecker(selector) {
-	console.log('markChecker', qs(selector))
-	qsa('.checker').forEach(function(e) {e.setAttribute('style', 'box-shadow: none;')})
+	qsa('.checker').forEach(function (e) {
+		e.setAttribute('style', 'box-shadow: none;')
+	})
 	qs(selector).setAttribute('style', 'box-shadow: 0px 0px 3px 4px red;')
 }
