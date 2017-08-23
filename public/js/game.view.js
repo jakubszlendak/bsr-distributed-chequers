@@ -69,7 +69,11 @@
 					clazz: 'success',
 					message: 'User ' + user.username + ' registered and logged in.'
 				})
-				setupUserUI(user)
+				// setupUserUI(user)
+				var login = usernameInput.value
+				var pass = passwdInput.value
+	
+				controller.login(login, pass)
 
 			}
 		})

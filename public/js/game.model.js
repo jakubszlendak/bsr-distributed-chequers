@@ -58,7 +58,7 @@
 		GameModel.prototype.setInvitedPlayer= function (playerName) {
 			this.invitedPlayer = playerName
 			this.opponentName = playerName
-			this.eventEmitter.emitEvent('invitedPlayer', [this.invitedPlaye])
+			this.eventEmitter.emitEvent('invitedPlayer', [this.invitedPlayer])
 		}
 
 		GameModel.prototype.setInvitedPlayerDecision= function (decision) {

@@ -31,7 +31,7 @@ a {
   border: 2px solid gray;
   margin: 0 auto;
   border-collapse: collapse;
-  background: black;
+  background: white;
 }
 
 #gameBoard td {
@@ -41,22 +41,25 @@ a {
 
 tr:nth-child(odd) td:nth-child(even),
 tr:nth-child(even) td:nth-child(odd) {
-  background: white;
+  background: black;
 }
 
 .checker {
   height: 40px;
   width: 40px;
   border-radius: 100%;
-  border-width: 4px;
+  border-width: 2px;
   margin: 0 auto;
   border-style: solid;
-  border-color: black;
+  border-color: white;
   text-align: center;
 }
 
 .checker.black {
   background-color: black
+}
+.checker.white {
+  background-color: white
 }
 
 .checker.king {
