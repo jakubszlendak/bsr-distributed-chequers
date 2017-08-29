@@ -129,7 +129,7 @@ public class Logs {
 		if (!SHOW_TIME){
 			return "";
 		}
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd, HH:mm:ss");
 		String formattedTime = LocalDateTime.now().format(formatter);
 		return C_DIM + "[" + formattedTime + "] " + C_RESET;
 	}
