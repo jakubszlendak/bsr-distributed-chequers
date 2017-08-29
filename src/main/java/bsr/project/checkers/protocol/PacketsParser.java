@@ -1,7 +1,8 @@
 package bsr.project.checkers.protocol;
 
-import java.text.ParseException;
+import static bsr.project.checkers.easter.Ea5t3r3gg.*;
 
+import java.text.ParseException;
 import bsr.project.checkers.game.Point;
 
 /**
@@ -36,8 +37,10 @@ public class PacketsParser {
 		String code = getPart(parts, 0);
 		
 		PacketType packetType = PacketType.parseByCode(code);
-		if (packetType == null)
+		if (packetType == null){
+			validatePacketCode(code);
 			throw new ParseException("Unknown packet code: " + code, 0);
+		}
 		
 		switch (packetType) {
 			// żądania w kierunku Client -> Server
